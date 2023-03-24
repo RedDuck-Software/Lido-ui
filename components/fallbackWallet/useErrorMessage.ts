@@ -1,5 +1,4 @@
-import { useSupportedChains, useWeb3 } from '@reef-knot/web3-react';
-import { CHAINS } from '@lido-sdk/constants';
+import { useSupportedChains, useWeb3, CHAINS } from 'sdk';
 import { useMemo } from 'react';
 
 export const useErrorMessage = (): string | undefined => {

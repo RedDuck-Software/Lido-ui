@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getRPCUrls } from '@lido-sdk/fetch';
-import { CHAINS } from '@lido-sdk/constants';
+import { getRPCUrls, CHAINS } from 'sdk';
 import {
   wrapRequest,
   defaultErrorHandler,

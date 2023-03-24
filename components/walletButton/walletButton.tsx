@@ -8,7 +8,7 @@ import {
   WalledButtonLoaderStyle,
 } from './walletButtonStyles';
 import { useModal } from 'hooks';
-import { useEthereumBalance, useSDK } from '@lido-sdk/react';
+import { useEthereumBalance, useSDK } from 'sdk';
 import FormatToken from 'components/formatToken';
 import { MODAL } from 'providers';
 

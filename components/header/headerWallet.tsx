@@ -1,6 +1,5 @@
 import { FC } from 'react';
-import { CHAINS, getChainColor } from '@lido-sdk/constants';
-import { useSDK } from '@lido-sdk/react';
+import { useSDK, CHAINS, getChainColor } from 'sdk';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { ThemeToggler } from '@lidofinance/lido-ui';
 

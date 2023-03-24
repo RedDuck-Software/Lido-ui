@@ -1815,21 +1815,12 @@
   dependencies:
     tiny-invariant "^1.1.0"
 
-"@lido-sdk/contracts@2.0.0", "@lido-sdk/contracts@^2.0.0":
+"@lido-sdk/contracts@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@lido-sdk/contracts/-/contracts-2.0.0.tgz#3fd7de4c6e542e7bfd71ce07ccbaf72cb16df48b"
   integrity sha512-tMmnLzlPXm2/e7q8W+KHli0BJpQjbGtIly4OEyx5XRFK5hBNEYYVtGWg1h576EcpD/gWAPOBbEn8aeOsqqJ2dQ==
   dependencies:
     "@lido-sdk/constants" "1.6.0"
-    tiny-invariant "^1.1.0"
-
-"@lido-sdk/fetch@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@lido-sdk/fetch/-/fetch-2.1.0.tgz#b5273efea1c00902b553ac4f8820c6b5341ae470"
-  integrity sha512-F6mGhjXJmHskPASFzUYXHErtAX38eXD8g4tpeP2ibSKJdCjIzXBWm0QS6gKxd4lIPtkXmSJ3h6p204ZnisbcDQ==
-  dependencies:
-    "@lido-sdk/constants" "1.6.0"
-    node-fetch "^2.6.7"
     tiny-invariant "^1.1.0"
 
 "@lido-sdk/helpers@1.4.3", "@lido-sdk/helpers@^1.4.3":
@@ -2481,6 +2472,11 @@
     "@types/hoist-non-react-statics" "*"
     "@types/react" "*"
     csstype "^3.0.2"
+
+"@types/ua-parser-js@^0.7.36":
+  version "0.7.36"
+  resolved "https://registry.yarnpkg.com/@types/ua-parser-js/-/ua-parser-js-0.7.36.tgz#9bd0b47f26b5a3151be21ba4ce9f5fa457c5f190"
+  integrity sha512-N1rW+njavs70y2cApeIw1vLMYXRwfBy+7trgavGuuTfOd7j1Yh7QTRc/yqsPl6ncokt72ZXuxEU0PiCp9bSwNQ==
 
 "@types/unist@*", "@types/unist@^2.0.0":
   version "2.0.6"
@@ -6276,7 +6272,7 @@ node-addon-api@^2.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.2.tgz#432cfa82962ce494b132e9d72a15b29f71ff5d32"
   integrity sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==
 
-node-fetch@2, node-fetch@2.6.7, node-fetch@^2.6.1, node-fetch@^2.6.7:
+node-fetch@2, node-fetch@2.6.7, node-fetch@^2.6.1:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
@@ -7947,6 +7943,11 @@ ua-parser-js@^1.0.2:
   version "1.0.32"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.32.tgz#786bf17df97de159d5b1c9d5e8e9e89806f8a030"
   integrity sha512-dXVsz3M4j+5tTiovFVyVqssXBu5HM47//YSOeZ9fQkdDKkfzv2v3PP1jmH6FUyPW+yCSn7aBVK1fGGKNhowdDA==
+
+ua-parser-js@^1.0.34:
+  version "1.0.34"
+  resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-1.0.34.tgz#b33f41c415325839f354005d25a2f588be296976"
+  integrity sha512-K9mwJm/DaB6mRLZfw6q8IMXipcrmuT6yfhYmwhAkuh+81sChuYstYA+znlgaflUPaYUa3odxKPKGw6Vw/lANew==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"

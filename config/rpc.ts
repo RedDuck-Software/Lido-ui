@@ -1,4 +1,4 @@
-import { CHAINS } from '@lido-sdk/constants';
+import { CHAINS } from 'sdk';
 import getConfig from 'next/config';
 
 const { serverRuntimeConfig } = getConfig();
@@ -11,7 +11,5 @@ export const getBackendRPCPath = (chainId: CHAINS): string => {
 export const backendRPC = {
   [CHAINS.Mainnet]: getBackendRPCPath(CHAINS.Mainnet),
   [CHAINS.Goerli]: getBackendRPCPath(CHAINS.Goerli),
-  [CHAINS.Kovan]: getBackendRPCPath(CHAINS.Kovan),
-  [CHAINS.Rinkeby]: getBackendRPCPath(CHAINS.Rinkeby),
-  [CHAINS.Ropsten]: getBackendRPCPath(CHAINS.Ropsten),
+  [CHAINS.Sepolia]: getBackendRPCPath(CHAINS.Sepolia),
 };

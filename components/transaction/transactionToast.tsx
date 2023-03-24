@@ -1,5 +1,5 @@
 import { Link } from '@lidofinance/lido-ui';
-import { getEtherscanTxLink } from '@lido-sdk/helpers';
+import { getEtherscanTxLink } from 'sdk';
 import {
   TransactionDescriptionStyle,
   TransactionTitleStyle,

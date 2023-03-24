@@ -2,11 +2,7 @@ import { FC, FormEventHandler, useEffect } from 'react';
 import { GetStaticProps } from 'next';
 import styled from 'styled-components';
 import Head from 'next/head';
-import {
-  useContractSWR,
-  useSTETHContractRPC,
-  useLidoSWR,
-} from '@lido-sdk/react';
+import { useContractSWR, useSTETHContractRPC, useLidoSWR } from 'sdk';
 import {
   Block,
   Link,

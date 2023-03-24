@@ -1,9 +1,27 @@
-import { contractHooksFactory } from '@lido-sdk/react';
-import { getExampleAddress } from 'config';
-import { ExampleAbi__factory } from 'generated';
+import { contractHooksFactory } from 'sdk';
+import {
+  WstethAbi__factory,
+  StethAbi__factory,
+  LdoAbi__factory,
+} from 'generated';
+import {
+  getWstethAddress,
+  getStethAddress,
+  getLdoAddress,
+} from '../config/addresses';
 
-const example = contractHooksFactory(ExampleAbi__factory, (chainId) =>
-  getExampleAddress(chainId),
+const wsteth = contractHooksFactory(WstethAbi__factory, (chainId) =>
+  getWstethAddress(chainId),
 );
-export const useExampleContractRPC = example.useContractRPC;
-export const useExampleContractWeb3 = example.useContractWeb3;
+const steth = contractHooksFactory(StethAbi__factory, (chainId) =>
+  getStethAddress(chainId),
+);
+const ldo = contractHooksFactory(LdoAbi__factory, (chainId) =>
+  getLdoAddress(chainId),
+);
+export const useWstethContractRPC = wsteth.useContractRPC;
+export const useWstethContractWeb3 = wsteth.useContractWeb3;
+export const useStethContractRPC = steth.useContractRPC;
+export const useStethContractWeb3 = steth.useContractWeb3;
+export const useLdoContractRPC = ldo.useContractRPC;
+export const useLdoContractWeb3 = ldo.useContractWeb3;

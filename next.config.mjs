@@ -1,17 +1,13 @@
-import { CHAINS } from '@lido-sdk/constants';
 import buildDynamics from './scripts/build-dynamics.mjs';
 
 buildDynamics();
 
 const basePath = process.env.BASE_PATH || '';
 const infuraApiKey = process.env.INFURA_API_KEY;
-const alchemyApiKey = process.env.ALCHEMY_API_KEY;
 const apiProviderUrls = {
-  [CHAINS.Mainnet]: process.env[`API_PROVIDER_URL_${CHAINS.Mainnet}`],
-  [CHAINS.Ropsten]: process.env[`API_PROVIDER_URL_${CHAINS.Ropsten}`],
-  [CHAINS.Rinkeby]: process.env[`API_PROVIDER_URL_${CHAINS.Rinkeby}`],
-  [CHAINS.Goerli]: process.env[`API_PROVIDER_URL_${CHAINS.Goerli}`],
-  [CHAINS.Kovan]: process.env[`API_PROVIDER_URL_${CHAINS.Kovan}`],
+  [1]: process.env[`API_PROVIDER_URL_${1}`],
+  [5]: process.env[`API_PROVIDER_URL_${5}`],
+  [11155111]: process.env[`API_PROVIDER_URL_${11155111}`],
 };
 
 const cspTrustedHosts = process.env.CSP_TRUSTED_HOSTS;
@@ -50,7 +46,7 @@ export default {
   serverRuntimeConfig: {
     basePath,
     infuraApiKey,
-    alchemyApiKey,
+    // alchemyApiKey,
     apiProviderUrls,
     cspTrustedHosts,
     cspReportOnly,
