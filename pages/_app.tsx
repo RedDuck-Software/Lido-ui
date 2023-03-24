@@ -9,6 +9,8 @@ import {
 import Providers from 'providers';
 import { CustomAppProps } from 'types';
 import { withCsp } from 'utils/withCsp';
+import Layout from 'components/layout';
+import { useRouter } from 'next/router';
 
 // Migrations old cookies to new cross domain cookies
 migrationThemeCookiesToCrossDomainCookiesClientSide();
@@ -20,8 +22,26 @@ migrationAllowCookieToCrossDomainCookieClientSide(
 
 const App = (props: AppProps): JSX.Element => {
   const { Component, pageProps } = props;
+  const routes = useRouter();
 
-  return <Component {...pageProps} />;
+  const title =
+    routes.pathname === '/'
+      ? 'Stake'
+      : routes.pathname === '/wrap'
+      ? 'Wrap'
+      : 'Rewards';
+  const description =
+    routes.pathname === '/'
+      ? 'Stake you ETH'
+      : routes.pathname === '/wrap'
+      ? 'Wrap your stETH'
+      : 'Rewards stats';
+
+  return (
+    <Layout title={title} subtitle={description}>
+      <Component {...pageProps} />
+    </Layout>
+  );
 };
 
 const MemoApp = memo(App);
