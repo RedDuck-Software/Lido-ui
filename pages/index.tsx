@@ -5,9 +5,11 @@ import Head from 'next/head';
 import {
   useContractSWR,
   useSTETHContractRPC,
-  useLidoSWR,
   useSDK,
   getEtherscanTxLink,
+  getEtherscanTokenLink,
+  useEthPrice,
+  useTxPrice,
 } from 'sdk';
 import {
   Block,
@@ -23,12 +25,12 @@ import { trackEvent, MatomoEventType } from '@lidofinance/analytics-matomo';
 import Wallet from 'components/wallet';
 import Section from 'components/section';
 import Faq from 'components/faq';
-import { standardFetcher } from 'utils';
 import { FAQItem, getFaqList } from 'utils/faqList';
 import { useStethContractWeb3 } from '../hooks';
 import { constants, utils } from 'ethers';
 import notify from '../utils/notify';
 import StatusModal from 'components/statusModal';
+import { getStethAddress } from '../config/addresses';
 
 interface HomeProps {
   faqList: FAQItem[];
@@ -79,9 +81,14 @@ const Home: FC<HomeProps> = ({ faqList }) => {
     contract: contractRpc,
     method: 'name',
   });
+  const totalStaked = useContractSWR({
+    contract: contractRpc,
+    method: 'getTotalPooledEther',
+  });
 
-  const { data } = useLidoSWR<number>('/api/oneinch-rate', standardFetcher);
-  const oneInchRate = data ? (100 - (1 / data) * 100).toFixed(2) : 1;
+  const ethPrice = useEthPrice();
+
+  const txPrice = useTxPrice(200000);
 
   const setStatusData = ({
     amount,
@@ -217,15 +224,62 @@ const Home: FC<HomeProps> = ({ faqList }) => {
             Submit
           </Button>
         </form>
+        <DataTable style={{ paddingTop: '24px' }}>
+          <DataTableRow
+            title="You will receive"
+            loading={tokenName.initialLoading}
+          >
+            {enteredAmount || 0} stETH
+          </DataTableRow>
+          <DataTableRow
+            title="Exchange rate"
+            loading={tokenName.initialLoading}
+          >
+            1 ETH = 1 stETH
+          </DataTableRow>
+          <DataTableRow
+            title="Max transaction cost"
+            loading={txPrice.initialLoading}
+          >
+            ${(txPrice.data ?? 0).toFixed(2)}
+          </DataTableRow>
+          <DataTableRow
+            title="Reward fee"
+            loading={tokenName.initialLoading}
+            help="Please note: this fee applies to staking rewards only, and is NOT taken from your staked amount."
+          >
+            15%
+          </DataTableRow>
+        </DataTable>
       </Block>
-      <Section title="Data table" headerDecorator={<Link href="#">Link</Link>}>
+      <Section
+        title="Statistics"
+        headerDecorator={
+          <Link href={getEtherscanTokenLink(chainId, getStethAddress(chainId))}>
+            View on Etherscan
+          </Link>
+        }
+      >
         <Block>
           <DataTable>
-            <DataTableRow title="Token name" loading={tokenName.initialLoading}>
-              {tokenName.data}
+            <DataTableRow
+              title="Total staked"
+              loading={totalStaked.initialLoading}
+            >
+              {(+utils.formatUnits(
+                totalStaked.data ?? constants.Zero,
+              )).toLocaleString()}{' '}
+              ETH
             </DataTableRow>
-            <DataTableRow title="1inch rate" loading={tokenName.initialLoading}>
-              {oneInchRate}
+            <DataTableRow
+              title="stETH market cap"
+              loading={tokenName.initialLoading || ethPrice.loading}
+            >
+              $
+              {(
+                +utils.formatUnits(totalStaked.data ?? constants.Zero) *
+                (ethPrice.data ?? 0)
+              ).toLocaleString()}
             </DataTableRow>
           </DataTable>
         </Block>

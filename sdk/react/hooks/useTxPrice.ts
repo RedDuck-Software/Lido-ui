@@ -5,6 +5,9 @@ import { useCallback, useMemo } from 'react';
 import { useEthereumSWR } from './useEthereumSWR';
 import { useEthPrice } from './useEthPrice';
 import { SWRResponse } from './useLidoSWR';
+import { useSDK } from './useSDK';
+import { useAsyncFetch } from './useAsyncFetch';
+import { constants } from 'ethers';
 
 const getTxPrice = (
   gasLimit: BigNumberish,
@@ -22,8 +25,22 @@ const getTxPrice = (
 };
 
 export const useTxPrice = (
-  gasLimit: BigNumberish,
+  gasLimit?: BigNumberish,
 ): Omit<SWRResponse<number>, 'mutate'> => {
+  const { providerRpc } = useSDK();
+
+  const {
+    data: gasLimitInternal,
+    loading: limitLoading,
+    error: limitError,
+  } = useAsyncFetch<BigNumberish>(async () => {
+    if (gasLimit) return gasLimit;
+
+    return await providerRpc
+      .getBlock('latest')
+      .then((result) => result.gasLimit);
+  });
+
   const eth = useEthPrice();
   const gas = useEthereumSWR({ method: 'getGasPrice' });
 
@@ -31,16 +48,16 @@ export const useTxPrice = (
   const gasPrice = gas.data;
 
   const data = useMemo(() => {
-    return getTxPrice(gasLimit, ethPrice, gasPrice);
-  }, [gasLimit, ethPrice, gasPrice]);
+    return getTxPrice(gasLimitInternal ?? constants.Zero, ethPrice, gasPrice);
+  }, [gasLimitInternal, ethPrice, gasPrice]);
 
   const updateEth = eth.update;
   const updateGas = gas.update;
 
   const update = useCallback(async () => {
     const [ethPrice, gasPrice] = await Promise.all([updateEth(), updateGas()]);
-    return getTxPrice(gasLimit, ethPrice, gasPrice);
-  }, [gasLimit, updateEth, updateGas]);
+    return getTxPrice(gasLimitInternal ?? constants.Zero, ethPrice, gasPrice);
+  }, [gasLimitInternal, updateEth, updateGas]);
 
   return {
     update,
@@ -52,13 +69,13 @@ export const useTxPrice = (
      */
 
     get loading() {
-      return eth.loading || gas.loading;
+      return eth.loading || gas.loading || limitLoading;
     },
     get initialLoading() {
       return eth.initialLoading || gas.initialLoading;
     },
     get error() {
-      return eth.error || gas.error;
+      return eth.error || gas.error || limitError;
     },
   };
 };
