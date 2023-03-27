@@ -1,6 +1,8 @@
 import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   StethAbi,
+  useAllowance,
+  useContractEstimateGasSWR,
   useContractSWR,
   useEthereumBalance,
   useSDK,
@@ -35,7 +37,8 @@ import Tabs from '../../components/tabs/Tabs';
 import styled from 'styled-components';
 import { INITIAL_STATUS, IStatus, setStatusData } from '../../config/steps';
 import { BigNumber } from '@ethersproject/bignumber';
-import { getWstethAddress } from '../../config/addresses';
+import { getStethAddress, getWstethAddress } from '../../config/addresses';
+import { FilterAsyncMethods } from '../../sdk/react/hooks/types';
 
 const iconsMap = {
   eth: <Eth />,
@@ -75,6 +78,11 @@ const Wrap = () => {
   const wstethBalance = useWSTETHBalance();
   const ethBalance = useEthereumBalance();
 
+  const stethAllowance = useAllowance(
+    getStethAddress(chainId),
+    getWstethAddress(chainId),
+  );
+
   useEffect(() => {
     const matomoSomeEvent: MatomoEventType = [
       'Lido_Frontend_Template',
@@ -103,7 +111,17 @@ const Wrap = () => {
     return parseFloat(currentBalance) < parseFloat(enteredAmount);
   }, [currentBalance, enteredAmount]);
 
-  const txPrice = useTxPrice(300000);
+  const approveGas = useContractEstimateGasSWR<
+    StethAbi,
+    FilterAsyncMethods<StethAbi['estimateGas']>,
+    true
+  >({
+    contract: stETH || undefined,
+    method: 'approve',
+    params: [getWstethAddress(chainId), constants.WeiPerEther],
+  });
+
+  const approveTxPrice = useTxPrice(approveGas.data);
 
   const approve = async (
     contract: WstethAbi | StethAbi,
@@ -364,12 +382,15 @@ const Wrap = () => {
         </form>
         <DataTable style={{ paddingTop: '24px' }}>
           {selectedTab === 'WRAP' && (
-            <DataTableRow title="Max unlock fee" loading={false}>
-              soon
+            <DataTableRow
+              title="Max unlock fee"
+              loading={approveTxPrice.initialLoading}
+            >
+              ${(approveTxPrice.data || 0).toFixed(2)}
             </DataTableRow>
           )}
-          <DataTableRow title="Max gas fee" loading={txPrice.initialLoading}>
-            ${(txPrice.data ?? 0).toFixed(2)}
+          <DataTableRow title="Max gas fee" loading={false}>
+            soon
           </DataTableRow>
           <DataTableRow
             title="Exchange rate"
@@ -388,11 +409,26 @@ const Wrap = () => {
           </DataTableRow>
           {selectedTab === 'WRAP' && (
             <>
-              <DataTableRow title="Allowance" loading={false}>
-                soon
+              <DataTableRow
+                title="Allowance"
+                loading={stethAllowance.initialLoading}
+              >
+                {(+utils.formatUnits(
+                  stethAllowance.data || constants.Zero,
+                )).toFixed(4)}{' '}
+                stETH
               </DataTableRow>
-              <DataTableRow title="You will receive" loading={false}>
-                soon
+              <DataTableRow
+                title="You will receive"
+                loading={oneStToWst.initialLoading}
+              >
+                {(+utils.formatUnits(
+                  utils
+                    .parseUnits(enteredAmount || '0')
+                    .mul(oneStToWst.data || constants.Zero),
+                  36,
+                )).toFixed(4)}{' '}
+                wstETH
               </DataTableRow>
             </>
           )}
