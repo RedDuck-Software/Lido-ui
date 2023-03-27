@@ -7,26 +7,41 @@ import {
 import { Divider } from '@lidofinance/lido-ui';
 import {
   TOKENS,
+  useContractSWR,
   useEthereumBalance,
   useSDK,
   useSTETHBalance,
   useTokenAddress,
   useWSTETHBalance,
+  useWSTETHContractRPC,
 } from 'sdk';
 import { useWeb3 } from '@reef-knot/web3-react';
 import FormatToken from 'components/formatToken';
 import FallbackWallet from 'components/fallbackWallet';
 import TokenToWallet from 'components/tokenToWallet';
 import { WalletComponent } from './types';
+import { constants } from 'ethers';
 
 const Wallet: WalletComponent = (props) => {
   const { account } = useSDK();
+  const wstethRPC = useWSTETHContractRPC();
   const eth = useEthereumBalance();
   const steth = useSTETHBalance();
   const wsteth = useWSTETHBalance();
 
   const stethAddress = useTokenAddress(TOKENS.STETH);
   const wstethAddress = useTokenAddress(TOKENS.WSTETH);
+
+  const stETHToWstETH = useContractSWR({
+    contract: wstethRPC,
+    method: 'getWstETHByStETH',
+    params: [steth.data || constants.Zero],
+  });
+  const wstETHToStETH = useContractSWR({
+    contract: wstethRPC,
+    method: 'getStETHByWstETH',
+    params: [wsteth.data || constants.Zero],
+  });
 
   return (
     <WalletCard {...props}>
@@ -42,26 +57,52 @@ const Wallet: WalletComponent = (props) => {
       <WalletCardRow>
         <WalletCardBalance
           small
-          title="Token balance"
-          loading={steth.initialLoading}
+          title={props.onlyStETH ? 'Staked balance' : 'Token balance'}
+          loading={steth.initialLoading || stETHToWstETH.initialLoading}
           value={
-            <>
-              <FormatToken amount={steth.data} symbol="stETH" />
-              <TokenToWallet address={stethAddress} />
-            </>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <FormatToken amount={steth.data} symbol="stETH" />
+                <TokenToWallet address={stethAddress} />
+              </div>
+              {!props.onlyStETH && (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <p style={{ fontWeight: 400, fontSize: '12px' }}>~</p>
+                  <FormatToken
+                    style={{ fontWeight: 400, fontSize: '12px' }}
+                    amount={stETHToWstETH.data}
+                    symbol="wstETH"
+                  />
+                </div>
+              )}
+            </div>
           }
         />
-        <WalletCardBalance
-          small
-          title="Token balance"
-          loading={wsteth.initialLoading}
-          value={
-            <>
-              <FormatToken amount={wsteth.data} symbol="wstETH" />
-              <TokenToWallet address={wstethAddress} />
-            </>
-          }
-        />
+        {!props.onlyStETH && (
+          <WalletCardBalance
+            small
+            title="Token balance"
+            loading={wsteth.initialLoading}
+            value={
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <FormatToken amount={wsteth.data} symbol="wstETH" />
+                  <TokenToWallet address={wstethAddress} />
+                </div>
+                {!props.onlyStETH && (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <p style={{ fontWeight: 400, fontSize: '12px' }}>~</p>
+                    <FormatToken
+                      style={{ fontWeight: 400, fontSize: '12px' }}
+                      amount={wstETHToStETH.data}
+                      symbol="stETH"
+                    />
+                  </div>
+                )}
+              </div>
+            }
+          />
+        )}
       </WalletCardRow>
     </WalletCard>
   );

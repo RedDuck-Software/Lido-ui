@@ -2,7 +2,7 @@ import { Component } from 'types';
 import { BlockProps } from '@lidofinance/lido-ui';
 import { FC } from 'react';
 
-export type WalletCardComponent = FC<BlockProps>;
+export type WalletCardComponent = FC<BlockProps & { onlyStETH?: boolean }>;
 
 export type WalletCardRowComponent = Component<'div'>;
 

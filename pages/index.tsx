@@ -6,7 +6,6 @@ import {
   useContractSWR,
   useSTETHContractRPC,
   useSDK,
-  getEtherscanTxLink,
   getEtherscanTokenLink,
   useEthPrice,
   useTxPrice,
@@ -31,6 +30,7 @@ import { constants, utils } from 'ethers';
 import notify from '../utils/notify';
 import StatusModal from 'components/statusModal';
 import { getStethAddress } from '../config/addresses';
+import { INITIAL_STATUS, setStatusData } from '../config/steps';
 
 interface HomeProps {
   faqList: FAQItem[];
@@ -40,29 +40,11 @@ const InputWrapper = styled.div`
   margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
 `;
 
-type StatusProps = {
-  step: string;
-  amount?: string;
-  reason?: string;
-  transactionHash?: string;
-  retry?: boolean;
-};
-
-const initialStatus = {
-  title: '',
-  subtitle: '',
-  additionalDetails: '',
-  link: '',
-  type: '',
-  show: false,
-  retry: false,
-};
-
 const Home: FC<HomeProps> = ({ faqList }) => {
   const { chainId } = useSDK();
   const stETH = useStethContractWeb3();
   const [enteredAmount, setEnteredAmount] = useState('');
-  const [status, setStatus] = useState(initialStatus);
+  const [status, setStatus] = useState(INITIAL_STATUS);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canStake, setCanStake] = useState(false);
 
@@ -88,66 +70,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
 
   const ethPrice = useEthPrice();
 
-  const txPrice = useTxPrice(200000);
-
-  const setStatusData = ({
-    amount,
-    step,
-    transactionHash,
-    retry,
-    reason,
-  }: StatusProps) => {
-    switch (step) {
-      case 'confirm':
-        setStatus({
-          title: `You are now submitting ETH`,
-          subtitle: `Submitting ${amount}. You will receive stETH. `,
-          additionalDetails: 'Confirm this transaction in your wallet',
-          type: 'loading',
-          link: '',
-          show: true,
-          retry: false,
-        });
-        break;
-      case 'processing':
-        setStatus({
-          title: `You are now submitting ETH`,
-          subtitle: `Submitting ${amount}. You will receive stETH. `,
-          additionalDetails: 'Processing your transaction',
-          type: 'loading',
-          link: '',
-          show: true,
-          retry: false,
-        });
-        break;
-      case 'failed':
-        setStatus({
-          title: `Transaction Failed`,
-          subtitle: reason || 'Something went wrong',
-          additionalDetails: '',
-          type: 'error',
-          link: transactionHash
-            ? getEtherscanTxLink(chainId, transactionHash)
-            : '',
-          show: true,
-          retry: retry || false,
-        });
-        break;
-      default:
-        setStatus({
-          title: `Submit successful`,
-          subtitle: `You have submitted ${amount} ETH.`,
-          additionalDetails: '',
-          type: 'success',
-          link: transactionHash
-            ? getEtherscanTxLink(chainId, transactionHash)
-            : '',
-          show: true,
-          retry: false,
-        });
-        break;
-    }
-  };
+  const txPrice = useTxPrice(300000);
 
   const handleSubmitTokens = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -155,23 +78,41 @@ const Home: FC<HomeProps> = ({ faqList }) => {
       setIsSubmitting(true);
       try {
         const parsedAmount = utils.parseUnits(enteredAmount);
-        setStatusData({ amount: enteredAmount, step: 'confirm' });
+        setStatusData({
+          amount: enteredAmount,
+          step: 'submit-confirm',
+          chainId,
+          setStatus: (val) => setStatus(val),
+        });
         const submit = await stETH.submit(constants.AddressZero, {
           value: parsedAmount,
         });
-        setStatusData({ amount: enteredAmount, step: 'processing' });
+        setStatusData({
+          amount: enteredAmount,
+          step: 'submit-processing',
+          chainId,
+          setStatus: (val) => setStatus(val),
+        });
         const response = await submit.wait();
         const { status, transactionHash } = response;
         if (status) {
           setStatusData({
             amount: enteredAmount,
             transactionHash,
-            step: 'success',
+            step: 'submit-success',
+            chainId,
+            setStatus: (val) => setStatus(val),
           });
           setEnteredAmount('');
           setCanStake(false);
         } else {
-          setStatusData({ transactionHash, step: 'failed', retry: true });
+          setStatusData({
+            transactionHash,
+            step: 'failed',
+            retry: true,
+            chainId,
+            setStatus: (val) => setStatus(val),
+          });
         }
         setIsSubmitting(false);
       } catch (ex) {
@@ -180,6 +121,8 @@ const Home: FC<HomeProps> = ({ faqList }) => {
           step: 'failed',
           reason: error.message.replace('MetaMask Tx Signature: ', ''),
           retry: true,
+          chainId,
+          setStatus: (val) => setStatus(val),
         });
         setIsSubmitting(false);
       }
@@ -206,7 +149,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
       <Head>
         <title>Lido | Frontend Template</title>
       </Head>
-      <Wallet />
+      <Wallet onlyStETH />
       <Block>
         <form action="" method="post" onSubmit={handleSubmitTokens}>
           <InputWrapper>
@@ -292,7 +235,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
         link={status.link}
         type={status.type}
         show={status.show}
-        onClose={() => setStatus(initialStatus)}
+        onClose={() => setStatus(INITIAL_STATUS)}
         retry={status.retry}
         onRetry={handleSubmitTokens}
       />

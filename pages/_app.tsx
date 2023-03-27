@@ -26,15 +26,15 @@ const App = (props: AppProps): JSX.Element => {
 
   const title =
     routes.pathname === '/'
-      ? 'Stake'
+      ? 'Stake Ether'
       : routes.pathname === '/wrap'
-      ? 'Wrap'
+      ? 'Wrap & Unwrap'
       : 'Rewards';
   const description =
     routes.pathname === '/'
-      ? 'Stake you ETH'
+      ? 'Stake ETH and receive stETH while staking.'
       : routes.pathname === '/wrap'
-      ? 'Wrap your stETH'
+      ? 'Stable-balance stETH wrapper for DeFi'
       : 'Rewards stats';
 
   return (
