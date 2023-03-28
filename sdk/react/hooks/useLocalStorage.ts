@@ -27,7 +27,7 @@ export const useLocalStorage = <T>(
   const [storedValue, setStoredValue] = useState(readValue);
 
   const saveToStorage = useCallback(
-    (newValue) => {
+    (newValue: any) => {
       try {
         window.localStorage.setItem(key, JSON.stringify(newValue));
         window.dispatchEvent(new Event('local-storage'));
@@ -42,7 +42,7 @@ export const useLocalStorage = <T>(
   );
 
   const setValue = useCallback(
-    (value) => {
+    (value: any) => {
       if (value instanceof Function) {
         setStoredValue((current) => {
           const newValue = value(current);

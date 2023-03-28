@@ -8,7 +8,7 @@ import {
   ToastPending,
   ToastSuccess,
 } from '@lidofinance/lido-ui';
-import { CHAINS } from '../../config/chains';
+import { CHAINS } from '../../sdk';
 import { runWithTransactionLogger } from 'utils';
 import {
   TransactionToast,

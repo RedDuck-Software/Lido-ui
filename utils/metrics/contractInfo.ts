@@ -1,5 +1,5 @@
 import { Gauge } from 'prom-client';
-import { CHAINS } from 'config/chains';
+import { CHAINS } from 'sdk';
 import { dynamics, METRICS_PREFIX } from 'config';
 import {
   getLdoAddress,
@@ -7,6 +7,8 @@ import {
   getWstethAddress,
 } from '../../config/addresses';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 const chainId = +dynamics.defaultChain as CHAINS;
 
 const contracts: Record<string, string> = {
