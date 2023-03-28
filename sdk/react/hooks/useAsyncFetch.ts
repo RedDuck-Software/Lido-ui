@@ -6,7 +6,10 @@ interface Response<B> {
   error: Error | null;
 }
 
-export const useAsyncFetch = <T>(promise: () => Promise<T>): Response<T> => {
+export const useAsyncFetch = <T>(
+  promise: () => Promise<T>,
+  deps: any[],
+): Response<T> => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -24,7 +27,8 @@ export const useAsyncFetch = <T>(promise: () => Promise<T>): Response<T> => {
       setLoading(false);
       setError(error);
     }
-  }, [promise]);
+    // eslint-disable-next-line
+  }, [...deps]);
 
   return { data, error, loading };
 };
