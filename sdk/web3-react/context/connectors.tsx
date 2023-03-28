@@ -1,30 +1,24 @@
-import { createContext, FC, memo, ReactNode, useMemo } from 'react';
+import React, { createContext, FC, memo, ReactNode, useMemo } from 'react';
 import { InjectedConnector } from '@web3-react/injected-connector';
-import { WalletConnectConnector } from '@web3-react/walletconnect-connector';
 import { WalletLinkConnector } from '@web3-react/walletlink-connector';
 import { SafeAppConnector } from '@gnosis.pm/safe-apps-web3-react';
-import { CHAINS } from '../../constants';
-import { useSDK } from '../../react';
+import { CHAINS } from 'sdk/constants';
+import { useSDK } from 'sdk/react';
 import { LedgerHQFrameConnector } from 'web3-ledgerhq-frame-connector';
 import { LedgerHQConnector } from 'web3-ledgerhq-connector';
-import { useAutoConnect } from '../hooks';
+import { useAutoConnect } from '../hooks/useAutoConnect';
 import { CONNECTOR_NAMES } from '../constants';
-import { isUrl } from '../helpers';
 
 export interface ConnectorsContextProps {
   defaultChainId: CHAINS;
   rpc: Record<number, string>;
   appName?: string;
   appLogoUrl?: string;
-  autoConnectEnabled?: boolean;
   children: ReactNode;
 }
 
 export type ConnectorsContextValue = {
   injected: InjectedConnector;
-  walletconnect: WalletConnectConnector;
-  WalletConnectUri: WalletConnectConnector;
-  WalletConnectNoLinks: WalletConnectConnector;
   walletlink: WalletLinkConnector;
   coinbase: WalletLinkConnector;
   ledgerlive: LedgerHQFrameConnector;
@@ -35,11 +29,6 @@ export type ConnectorsContextValue = {
 export type Connector = keyof ConnectorsContextValue;
 
 export const ConnectorsContext = createContext({} as ConnectorsContextValue);
-
-const AutoConnect = (props: { connectors: ConnectorsContextValue }) => {
-  useAutoConnect(props.connectors);
-  return null;
-};
 
 const ProviderConnectors: FC<ConnectorsContextProps> = (props) => {
   const BASE_URL = typeof window === 'undefined' ? '' : window.location.origin;
@@ -52,66 +41,27 @@ const ProviderConnectors: FC<ConnectorsContextProps> = (props) => {
     defaultChainId,
     appName = DEFAULT_NAME,
     appLogoUrl = DEFAULT_LOGO,
-    autoConnectEnabled = true,
   } = props;
 
   const { supportedChainIds } = useSDK();
-  const walletConnectRPC = useMemo(
-    () =>
-      Object.entries(rpc).reduce(
-        (result, [key, value]) => ({
-          ...result,
-          [key]: isUrl(value) ? value : BASE_URL + value,
-        }),
-        {} as ConnectorsContextProps['rpc'],
-      ),
-    [rpc, BASE_URL],
-  );
+
+  // adds BASE_URL to `rpc` object's string values
+  // const walletConnectRPC = useMemo(
+  //   () =>
+  //     Object.entries(rpc).reduce(
+  //       (result, [key, value]) => ({
+  //         ...result,
+  //         [key]: isUrl(value) ? value : BASE_URL + value,
+  //       }),
+  //       {} as ConnectorsContextProps['rpc'],
+  //     ),
+  //   [rpc, BASE_URL],
+  // );
 
   const connectors = useMemo(
     () => ({
       [CONNECTOR_NAMES.INJECTED]: new InjectedConnector({
         supportedChainIds,
-      }),
-
-      [CONNECTOR_NAMES.WALLET_CONNECT]: new WalletConnectConnector({
-        // bridge: 'https://walletconnect-relay.lido.fi',
-        storageId: 'lido-walletconnect',
-        supportedChainIds,
-        rpc: walletConnectRPC,
-        qrcodeModalOptions: {
-          mobileLinks: [
-            'metamask',
-            'trust',
-            'gnosis safe multisig',
-            'imtoken',
-            'mathwallet',
-            'coin98',
-            'bitpay',
-            'ledger',
-            '1inch',
-            'huobi',
-            'unstoppable',
-          ],
-          desktopLinks: [],
-        },
-      }),
-
-      [CONNECTOR_NAMES.WALLET_CONNECT_NOLINKS]: new WalletConnectConnector({
-        storageId: 'lido-walletconnect',
-        supportedChainIds,
-        rpc: walletConnectRPC,
-        qrcodeModalOptions: {
-          mobileLinks: [],
-          desktopLinks: [],
-        },
-      }),
-
-      [CONNECTOR_NAMES.WALLET_CONNECT_URI]: new WalletConnectConnector({
-        storageId: 'lido-walletconnect',
-        supportedChainIds,
-        rpc: walletConnectRPC,
-        qrcode: false,
       }),
 
       [CONNECTOR_NAMES.GNOSIS]: (() => {
@@ -145,19 +95,13 @@ const ProviderConnectors: FC<ConnectorsContextProps> = (props) => {
         appLogoUrl,
       }),
     }),
-    [
-      appLogoUrl,
-      appName,
-      rpc,
-      defaultChainId,
-      supportedChainIds,
-      walletConnectRPC,
-    ],
+    [appLogoUrl, appName, rpc, defaultChainId, supportedChainIds],
   );
+
+  useAutoConnect(connectors);
 
   return (
     <ConnectorsContext.Provider value={connectors}>
-      {autoConnectEnabled && <AutoConnect connectors={connectors} />}
       {children}
     </ConnectorsContext.Provider>
   );

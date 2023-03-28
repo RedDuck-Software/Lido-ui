@@ -1,17 +1,20 @@
+import React, { memo, FC, useEffect, useState } from 'react';
 import invariant from 'tiny-invariant';
 import {
   Web3Provider,
   ExternalProvider,
   JsonRpcFetchFunc,
 } from '@ethersproject/providers';
-import { CHAINS } from '../../constants';
-import { getStaticRpcBatchProvider } from '../../providers';
-import { ProviderSDK as ProviderSDKBase } from '../../react';
-import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
-import { memo, FC } from 'react';
+import { CHAINS } from 'sdk/constants';
+import { getStaticRpcBatchProvider } from 'sdk/providers';
+import { ProviderSDK as ProviderSDKBase } from 'sdk/react';
+import { Web3ReactProvider } from '@web3-react/core';
+import { useAccount } from 'wagmi';
 import { SWRConfiguration } from 'swr';
+import { useWeb3 } from '../hooks/index';
 import { POLLING_INTERVAL } from '../constants';
 import ProviderConnectors, { ConnectorsContextProps } from './connectors';
+import Wagmi from '../../../providers/Wagmi';
 
 export interface ProviderWeb3Props extends ConnectorsContextProps {
   defaultChainId: CHAINS;
@@ -36,10 +39,19 @@ const ProviderSDK: FC<ProviderWeb3Props> = (props) => {
     pollingInterval = POLLING_INTERVAL,
     ...rest
   } = props;
-  const { chainId = defaultChainId, library, account } = useWeb3React();
+  const { chainId = defaultChainId, library, account } = useWeb3();
+  const [providerWeb3, setProviderWeb3] = useState(library);
 
-  console.log('chainId: ', chainId);
-  console.log('rpc: ', rpc);
+  // attempt to get providerWeb3 from wagmi
+  const { connector: connectorWagmi, isConnected } = useAccount();
+  useEffect(() => {
+    (async () => {
+      if (isConnected && !providerWeb3 && connectorWagmi) {
+        const p = await connectorWagmi.getProvider();
+        setProviderWeb3(getLibrary(p));
+      }
+    })();
+  }, [connectorWagmi, isConnected, providerWeb3]);
 
   invariant(rpc[chainId], `RPC url for chain ${chainId} is not provided`);
   invariant(rpc[CHAINS.Mainnet], 'RPC url for mainnet is not provided');
@@ -62,7 +74,7 @@ const ProviderSDK: FC<ProviderWeb3Props> = (props) => {
     <ProviderSDKBase
       chainId={chainId}
       supportedChainIds={supportedChainIds}
-      providerWeb3={library}
+      providerWeb3={providerWeb3}
       providerRpc={providerRpc}
       providerMainnetRpc={providerMainnetRpc}
       account={account ?? undefined}
@@ -74,28 +86,19 @@ const ProviderSDK: FC<ProviderWeb3Props> = (props) => {
 };
 
 const ProviderWeb3: FC<ProviderWeb3Props> = (props) => {
-  const {
-    children,
-    rpc,
-    appName,
-    appLogoUrl,
-    autoConnectEnabled,
-    ...sdkProps
-  } = props;
+  const { children, rpc, appName, appLogoUrl, ...sdkProps } = props;
   const { defaultChainId } = props;
-  const connectorsProps = {
-    rpc,
-    appName,
-    appLogoUrl,
-    defaultChainId,
-    autoConnectEnabled,
-  };
+  const connectorsProps = { rpc, appName, appLogoUrl, defaultChainId };
 
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <ProviderSDK rpc={rpc} {...sdkProps}>
-        <ProviderConnectors {...connectorsProps}>{children}</ProviderConnectors>
-      </ProviderSDK>
+      <Wagmi>
+        <ProviderSDK rpc={rpc} {...sdkProps}>
+          <ProviderConnectors {...connectorsProps}>
+            {children}
+          </ProviderConnectors>
+        </ProviderSDK>
+      </Wagmi>
     </Web3ReactProvider>
   );
 };

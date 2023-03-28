@@ -17,13 +17,12 @@ export enum PROVIDER_NAMES {
   OPERA = 'Opera Crypto Wallet',
   GAMESTOP = 'GameStop Wallet',
   XDEFI = 'XDEFI',
+  ZERION = 'Zerion',
 }
 
 export enum CONNECTOR_NAMES {
   GNOSIS = 'gnosis',
   WALLET_CONNECT = 'walletconnect',
-  WALLET_CONNECT_URI = 'WalletConnectUri',
-  WALLET_CONNECT_NOLINKS = 'WalletConnectNoLinks',
   WALLET_LINK = 'walletlink',
   COINBASE = 'coinbase',
   INJECTED = 'injected',
