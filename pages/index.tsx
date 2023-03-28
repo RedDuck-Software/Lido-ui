@@ -32,6 +32,8 @@ import notify from '../utils/notify';
 import StatusModal from 'components/statusModal';
 import { getStethAddress } from '../config/addresses';
 import { INITIAL_STATUS, setStatusData } from '../config/steps';
+import { useAsyncFetch } from '../sdk/react/hooks/useAsyncFetch';
+import { BigNumber } from '@ethersproject/bignumber';
 
 interface HomeProps {
   faqList: FAQItem[];
@@ -79,7 +81,19 @@ const Home: FC<HomeProps> = ({ faqList }) => {
 
   const ethPrice = useEthPrice();
 
-  const txPrice = useTxPrice(300000);
+  const submitGas = useAsyncFetch<BigNumber>(async () => {
+    if (stETH) {
+      const estimationWrap = await stETH.estimateGas.submit(
+        constants.AddressZero,
+        { value: constants.WeiPerEther },
+      );
+      console.log('estimation', +estimationWrap);
+      return estimationWrap;
+    }
+    return constants.Zero;
+  }, [stETH]);
+
+  const txPrice = useTxPrice(submitGas.data || constants.Zero);
 
   const handleSubmitTokens = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

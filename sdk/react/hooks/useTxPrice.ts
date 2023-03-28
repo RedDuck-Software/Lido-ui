@@ -39,7 +39,7 @@ export const useTxPrice = (
     return await providerRpc
       .getBlock('latest')
       .then((result) => result.gasLimit);
-  });
+  }, [gasLimit]);
 
   const eth = useEthPrice();
   const gas = useEthereumSWR({ method: 'getGasPrice' });

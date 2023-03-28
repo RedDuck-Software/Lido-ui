@@ -2,7 +2,6 @@ import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   StethAbi,
   useAllowance,
-  useContractEstimateGasSWR,
   useContractSWR,
   useEthereumBalance,
   useSDK,
@@ -38,7 +37,7 @@ import styled from 'styled-components';
 import { INITIAL_STATUS, IStatus, setStatusData } from '../../config/steps';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getStethAddress, getWstethAddress } from '../../config/addresses';
-import { FilterAsyncMethods } from '../../sdk/react/hooks/types';
+import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
 
 const iconsMap = {
   eth: <Eth />,
@@ -111,17 +110,52 @@ const Wrap = () => {
     return parseFloat(currentBalance) < parseFloat(enteredAmount);
   }, [currentBalance, enteredAmount]);
 
-  const approveGas = useContractEstimateGasSWR<
-    StethAbi,
-    FilterAsyncMethods<StethAbi['estimateGas']>,
-    true
-  >({
-    contract: stETH || undefined,
-    method: 'approve',
-    params: [getWstethAddress(chainId), constants.WeiPerEther],
-  });
+  const approveGas = useAsyncFetch<BigNumber>(async () => {
+    if (stETH) {
+      return await stETH.estimateGas.approve(
+        getWstethAddress(chainId),
+        constants.WeiPerEther,
+      );
+    }
+    return constants.Zero;
+  }, [stETH]);
 
-  const approveTxPrice = useTxPrice(approveGas.data);
+  const approveTxPrice = useTxPrice(approveGas.data || constants.Zero);
+
+  const submitGas = useAsyncFetch<BigNumber>(async () => {
+    if (stETH) {
+      return await stETH.estimateGas.submit(constants.AddressZero, {
+        value: constants.WeiPerEther,
+      });
+    }
+    return constants.Zero;
+  }, [stETH]);
+
+  const wrapGas = useAsyncFetch<BigNumber>(async () => {
+    if (wstethWEB3 && stETH) {
+      const allowance = await stETH.allowance(
+        account ?? '',
+        getWstethAddress(chainId),
+      );
+      if (allowance.eq(constants.Zero)) return constants.Zero;
+      return await wstethWEB3.estimateGas.wrap(allowance);
+    }
+    return constants.Zero;
+  }, [wstethWEB3, stETH]);
+
+  const unwrapGas = useAsyncFetch<BigNumber>(async () => {
+    if (wstethWEB3 && stETH) {
+      return await wstethWEB3.estimateGas.unwrap(
+        utils.parseUnits('0.000000001'),
+      );
+    }
+    return constants.Zero;
+  }, [wstethWEB3, stETH]);
+
+  const submitPrice = useTxPrice(submitGas.data || constants.Zero);
+
+  const wrapPrice = useTxPrice(wrapGas.data || constants.Zero);
+  const unwrapPrice = useTxPrice(unwrapGas.data || constants.Zero);
 
   const approve = async (
     contract: WstethAbi | StethAbi,
@@ -389,8 +423,22 @@ const Wrap = () => {
               ${(approveTxPrice.data || 0).toFixed(2)}
             </DataTableRow>
           )}
-          <DataTableRow title="Max gas fee" loading={false}>
-            soon
+          <DataTableRow
+            title="Max gas fee"
+            loading={
+              wrapPrice.initialLoading ||
+              submitPrice.initialLoading ||
+              unwrapPrice.initialLoading ||
+              approveTxPrice.initialLoading
+            }
+          >
+            $
+            {(selectedTab === 'UNWRAP'
+              ? unwrapPrice.data || 0
+              : (approveTxPrice.data || 0) +
+                (wrapPrice.data || 0) +
+                (activeToken === 'eth' ? submitPrice.data || 0 : 0)
+            ).toFixed(2)}
           </DataTableRow>
           <DataTableRow
             title="Exchange rate"

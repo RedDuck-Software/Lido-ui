@@ -14,7 +14,6 @@ import { SWRConfiguration } from 'swr';
 import { useWeb3 } from '../hooks/index';
 import { POLLING_INTERVAL } from '../constants';
 import ProviderConnectors, { ConnectorsContextProps } from './connectors';
-import Wagmi from '../../../providers/Wagmi';
 
 export interface ProviderWeb3Props extends ConnectorsContextProps {
   defaultChainId: CHAINS;
@@ -46,12 +45,14 @@ const ProviderSDK: FC<ProviderWeb3Props> = (props) => {
   const { connector: connectorWagmi, isConnected } = useAccount();
   useEffect(() => {
     (async () => {
-      if (isConnected && !providerWeb3 && connectorWagmi) {
+      if (library) {
+        setProviderWeb3(library);
+      } else if (isConnected && !providerWeb3 && connectorWagmi) {
         const p = await connectorWagmi.getProvider();
         setProviderWeb3(getLibrary(p));
       }
     })();
-  }, [connectorWagmi, isConnected, providerWeb3]);
+  }, [connectorWagmi, isConnected, library, providerWeb3]);
 
   invariant(rpc[chainId], `RPC url for chain ${chainId} is not provided`);
   invariant(rpc[CHAINS.Mainnet], 'RPC url for mainnet is not provided');
@@ -92,13 +93,9 @@ const ProviderWeb3: FC<ProviderWeb3Props> = (props) => {
 
   return (
     <Web3ReactProvider getLibrary={getLibrary}>
-      <Wagmi>
-        <ProviderSDK rpc={rpc} {...sdkProps}>
-          <ProviderConnectors {...connectorsProps}>
-            {children}
-          </ProviderConnectors>
-        </ProviderSDK>
-      </Wagmi>
+      <ProviderSDK rpc={rpc} {...sdkProps}>
+        <ProviderConnectors {...connectorsProps}>{children}</ProviderConnectors>
+      </ProviderSDK>
     </Web3ReactProvider>
   );
 };
