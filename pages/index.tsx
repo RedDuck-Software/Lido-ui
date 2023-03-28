@@ -1,4 +1,4 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
+import { FC, FormEvent, useEffect, useMemo, useState } from 'react';
 import { GetStaticProps } from 'next';
 import styled from 'styled-components';
 import Head from 'next/head';
@@ -9,6 +9,7 @@ import {
   getEtherscanTokenLink,
   useEthPrice,
   useTxPrice,
+  useEthereumBalance,
 } from 'sdk';
 import {
   Block,
@@ -47,6 +48,14 @@ const Home: FC<HomeProps> = ({ faqList }) => {
   const [status, setStatus] = useState(INITIAL_STATUS);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canStake, setCanStake] = useState(false);
+  const ethBalance = useEthereumBalance();
+
+  const insufficientBalance = useMemo(() => {
+    return (
+      parseFloat(utils.formatUnits(ethBalance.data || constants.Zero)) <
+      parseFloat(enteredAmount)
+    );
+  }, [ethBalance.data, enteredAmount]);
 
   useEffect(() => {
     const matomoSomeEvent: MatomoEventType = [
@@ -163,8 +172,12 @@ const Home: FC<HomeProps> = ({ faqList }) => {
               label="Amount"
             />
           </InputWrapper>
-          <Button fullwidth type="submit" disabled={!canStake}>
-            Submit
+          <Button
+            fullwidth
+            type="submit"
+            disabled={!canStake || insufficientBalance}
+          >
+            {insufficientBalance ? 'Insufficient Balance' : 'Submit'}
           </Button>
         </form>
         <DataTable style={{ paddingTop: '24px' }}>
