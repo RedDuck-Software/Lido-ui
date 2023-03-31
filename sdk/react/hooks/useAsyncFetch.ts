@@ -6,7 +6,7 @@ interface Response<B> {
   error: Error | null;
 }
 
-export const useAsyncFetch = <T>(
+export const useAsyncFetch = <T = any>(
   promise: () => Promise<T>,
   deps: any[],
 ): Response<T> => {
