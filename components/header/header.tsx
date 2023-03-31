@@ -46,7 +46,7 @@ const Header: FC = () => {
         <MainMenuItem
           active={active === 'rewards'}
           icon={<Wallet />}
-          onClick={() => routes.push('/')}
+          onClick={() => routes.push('/rewards')}
         >
           Rewards
         </MainMenuItem>
