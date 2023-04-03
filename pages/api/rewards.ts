@@ -10,9 +10,14 @@ import { rewardsHistory } from '../../graph/rewardHistory';
 import { IHistory, ITypes } from './interface/IHistory';
 // Date utilities
 import { fromUnixTime, format } from 'date-fns';
+import { BigNumber } from '@ethersproject/bignumber';
 
 // Helpers to display data in easily readable form
-const weiToHumanReadable = (wei: string): string => utils.formatUnits(wei);
+export const weiToHumanReadable = (wei: string, digits?: number): string =>
+  utils.formatUnits(
+    BigNumber.from(wei).div(10 ** (18 - (digits || 8))),
+    digits || 8,
+  );
 const dateToHumanReadable = (date: number) =>
   format(fromUnixTime(date), 'dd.MM.yyyy');
 
@@ -35,11 +40,10 @@ const rewards: API = async (req, res) => {
       date: dateToHumanReadable(parseInt(rew.blockTime)),
       type: rew.type as ITypes,
       change: weiToHumanReadable(rew.change),
-      apr: '10%',
+      apr: '10',
       balance: weiToHumanReadable(rew.balance),
     };
   });
-  console.log(formattedHistory);
 
   res.setHeader(
     'Content-Type',

@@ -29,13 +29,13 @@ const App = (props: AppProps): JSX.Element => {
       ? 'Stake Ether'
       : routes.pathname === '/wrap'
       ? 'Wrap & Unwrap'
-      : 'Rewards';
+      : 'Reward History';
   const description =
     routes.pathname === '/'
       ? 'Stake ETH and receive stETH while staking.'
       : routes.pathname === '/wrap'
       ? 'Stable-balance stETH wrapper for DeFi'
-      : 'Rewards stats';
+      : 'Track your Ethereum staking rewards with Lido.';
 
   return (
     <Layout title={title} subtitle={description}>

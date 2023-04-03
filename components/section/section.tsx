@@ -13,14 +13,16 @@ const Section: SectionComponent = (props) => {
 
   return (
     <SectionStyle {...rest}>
-      <SectionHeaderStyle>
-        <SectionTitleStyle>{title}</SectionTitleStyle>
-        {hasDecorator && (
-          <SectionHeaderDecoratorStyle>
-            {headerDecorator}
-          </SectionHeaderDecoratorStyle>
-        )}
-      </SectionHeaderStyle>
+      {title && (
+        <SectionHeaderStyle>
+          <SectionTitleStyle>{title}</SectionTitleStyle>
+          {hasDecorator && (
+            <SectionHeaderDecoratorStyle>
+              {headerDecorator}
+            </SectionHeaderDecoratorStyle>
+          )}
+        </SectionHeaderStyle>
+      )}
       <SectionContentStyle>{children}</SectionContentStyle>
     </SectionStyle>
   );

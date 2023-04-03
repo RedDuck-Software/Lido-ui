@@ -1,4 +1,4 @@
-export type ITypes = 'Rewards' | 'Transfer' | 'Staking';
+export type ITypes = 'Reward' | 'Transfer' | 'Staking';
 
 export interface IHistory {
   date: string;

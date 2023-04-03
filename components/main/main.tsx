@@ -1,8 +1,17 @@
 import { FC, PropsWithChildren } from 'react';
 import { MainStyle } from './mainStyles';
+import { useRouter } from 'next/router';
 
 const Main: FC<PropsWithChildren> = (props) => {
-  return <MainStyle size="tight" forwardedAs="main" {...props} />;
+  const routes = useRouter();
+  return (
+    <MainStyle
+      style={{ maxWidth: routes.pathname === '/rewards' ? '960px' : undefined }}
+      size="tight"
+      forwardedAs="main"
+      {...props}
+    />
+  );
 };
 
 export default Main;
