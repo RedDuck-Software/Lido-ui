@@ -26,12 +26,22 @@ import {
 } from '@lidofinance/lido-ui';
 import { standardFetcher } from '../../utils';
 import { WalletCard } from '../../components/walletCard';
-import { YellowLabel } from './styles';
 import Section from '../../components/section';
 import { IHistory } from '../api/interface/IHistory';
 import useMatchBreakpoints from '../../hooks/useMatchBreakpoints';
 import { constants, utils } from 'ethers';
 import { weiToHumanReadable } from '../api/rewards';
+import styled from 'styled-components';
+
+export const YellowLabel = styled.div`
+  width: 100%;
+  color: rgb(255, 172, 47);
+  background-color: rgba(255, 172, 47, 0.1);
+  text-align: center;
+  margin-top: 16px;
+  padding: 8px;
+  border-radius: 8px;
+`;
 
 const Wrap = () => {
   const { account, chainId } = useSDK();
