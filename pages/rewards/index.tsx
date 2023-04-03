@@ -1,88 +1,53 @@
-import React, { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  StethAbi,
-  useAllowance,
   useContractSWR,
-  useEthereumBalance,
+  useEthPrice,
   useLidoSWR,
   useSDK,
   useSTETHBalance,
-  useTxPrice,
-  useWSTETHBalance,
-  useWSTETHContractRPC,
-  useWSTETHContractWeb3,
-  WstethAbi,
+  useSTETHContractRPC,
 } from '../../sdk';
-import { useStethContractWeb3 } from '../../hooks';
 import { MatomoEventType, trackEvent } from '@lidofinance/analytics-matomo';
-import { constants, utils } from 'ethers';
-import notify from '../../utils/notify';
 import Head from 'next/head';
-import Wallet from '../../components/wallet';
 import {
   Block,
-  Button,
-  DataTable,
-  DataTableRow,
   Input,
-  InputGroup,
-  SelectIcon,
-  Option,
-  Eth,
-  Steth,
-  Wsteth,
+  HStack,
+  StackItem,
+  Text,
+  Link,
+  Table,
+  Thead,
+  Th,
+  Tr,
+  Tbody,
+  Td,
+  Checkbox,
 } from '@lidofinance/lido-ui';
-import StatusModal from '../../components/statusModal';
-import Tabs from '../../components/tabs/Tabs';
-import styled from 'styled-components';
-import { INITIAL_STATUS, IStatus, setStatusData } from '../../config/steps';
-import { BigNumber } from '@ethersproject/bignumber';
-import { getStethAddress, getWstethAddress } from '../../config/addresses';
-import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
 import { standardFetcher } from '../../utils';
-
-const iconsMap = {
-  eth: <Eth />,
-  steth: <Steth />,
-};
-
-const InputWrapper = styled(InputGroup)`
-  margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
-`;
+import { WalletCard } from '../../components/walletCard';
+import { YellowLabel } from './styles';
+import Section from '../../components/section';
+import { IHistory } from '../api/interface/IHistory';
+import useMatchBreakpoints from '../../hooks/useMatchBreakpoints';
+import { constants, utils } from 'ethers';
+import { weiToHumanReadable } from '../api/rewards';
 
 const Wrap = () => {
-  const ref = useRef(null);
   const { account, chainId } = useSDK();
-  const wstethWEB3 = useWSTETHContractWeb3();
-  const wstethRPC = useWSTETHContractRPC();
-  const [selectedTab, setSelectedTab] = useState<string>('WRAP');
-  const stETH = useStethContractWeb3();
-  const [enteredAmount, setEnteredAmount] = useState('');
-  const [status, setStatus] = useState<IStatus>(INITIAL_STATUS);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [canStake, setCanStake] = useState(false);
-  const [activeToken, setActiveToken] =
-    useState<keyof typeof iconsMap>('steth');
+  const { isMobile } = useMatchBreakpoints();
+  const ethPrice = useEthPrice();
+  const stETHBalance = useSTETHBalance();
+  const stethRPC = useSTETHContractRPC();
 
-  const oneStToWst = useContractSWR({
-    contract: wstethRPC,
-    method: 'getWstETHByStETH',
-    params: [constants.WeiPerEther],
-  });
-  const oneWstToSt = useContractSWR({
-    contract: wstethRPC,
-    method: 'getStETHByWstETH',
-    params: [constants.WeiPerEther],
-  });
+  const [address, setAddress] = useState<string>('');
+  const [onlyRewards, setOnlyRewards] = useState(false);
 
-  const stethBalance = useSTETHBalance();
-  const wstethBalance = useWSTETHBalance();
-  const ethBalance = useEthereumBalance();
-
-  const stethAllowance = useAllowance(
-    getStethAddress(chainId),
-    getWstethAddress(chainId),
-  );
+  useEffect(() => {
+    if (account) {
+      setAddress(account);
+    }
+  }, [account]);
 
   useEffect(() => {
     const matomoSomeEvent: MatomoEventType = [
@@ -94,419 +59,275 @@ const Wrap = () => {
     trackEvent(...matomoSomeEvent);
   }, []);
 
-  const currentBalance = useMemo<string>(() => {
-    return selectedTab === 'UNWRAP'
-      ? utils.formatUnits(wstethBalance.data || constants.Zero)
-      : activeToken === 'eth'
-      ? utils.formatUnits(ethBalance.data || constants.Zero)
-      : utils.formatUnits(stethBalance.data || constants.Zero);
-  }, [
-    ethBalance.data,
-    wstethBalance.data,
-    stethBalance.data,
-    activeToken,
-    selectedTab,
-  ]);
-
-  const insufficientBalance = useMemo(() => {
-    return parseFloat(currentBalance) < parseFloat(enteredAmount);
-  }, [currentBalance, enteredAmount]);
-
-  const approveGas = useAsyncFetch<BigNumber>(async () => {
-    if (stETH) {
-      return await stETH.estimateGas.approve(
-        getWstethAddress(chainId),
-        constants.WeiPerEther,
-      );
-    }
-    return constants.Zero;
-  }, [stETH]);
-
-  const history = useLidoSWR(
-    `/api/rewards?address=${account ?? ''}&chainId=${chainId}`,
+  const history = useLidoSWR<IHistory[]>(
+    `/api/rewards?address=${address ?? ''}&chainId=${chainId}`,
     standardFetcher,
+    { suspense: utils.isAddress(address) },
   );
 
-  useEffect(() => {
-    if (account && !history.data) {
-      history.update();
+  const sharesByOneETH = useContractSWR({
+    contract: stethRPC,
+    method: 'getSharesByPooledEth',
+    params: [constants.WeiPerEther],
+  });
+
+  const filteredHistory = useMemo<IHistory[]>(() => {
+    if (history.data) {
+      if (onlyRewards)
+        return history.data.filter((data) => data.type === 'Reward');
+      return history.data;
     }
-    console.log(history.data);
-  }, [account, history]);
+    return [];
+  }, [history, onlyRewards]);
 
-  const approveTxPrice = useTxPrice(approveGas.data || constants.Zero);
-
-  const submitGas = useAsyncFetch<BigNumber>(async () => {
-    if (stETH) {
-      return await stETH.estimateGas.submit(constants.AddressZero, {
-        value: constants.WeiPerEther,
-      });
-    }
-    return constants.Zero;
-  }, [stETH]);
-
-  const wrapGas = useAsyncFetch<BigNumber>(async () => {
-    if (wstethWEB3 && stETH) {
-      const allowance = await stETH.allowance(
-        account ?? '',
-        getWstethAddress(chainId),
+  const rewards = useMemo<number>(() => {
+    if (filteredHistory.length === 0) return 0;
+    return filteredHistory
+      .filter((data) => data.type === 'Reward')
+      .reduce(
+        (previousValue, currentValue) =>
+          previousValue + parseFloat(currentValue.change),
+        0,
       );
-      if (allowance.eq(constants.Zero)) return constants.Zero;
-      return await wstethWEB3.estimateGas.wrap(allowance);
-    }
-    return constants.Zero;
-  }, [wstethWEB3, stETH]);
+  }, [filteredHistory]);
 
-  const unwrapGas = useAsyncFetch<BigNumber>(async () => {
-    if (wstethWEB3 && stETH) {
-      return await wstethWEB3.estimateGas.unwrap(
-        utils.parseUnits('0.000000001'),
+  const rewardsInUsd = useMemo<number>(() => {
+    if (ethPrice.data) {
+      return rewards * ethPrice.data;
+    }
+    return 0;
+  }, [rewards, ethPrice]);
+
+  const avgAPR = useMemo<string>(() => {
+    if (filteredHistory.length !== 0) {
+      const sumAPR = filteredHistory.reduce(
+        (previousValue, currentValue) => previousValue + +currentValue.apr,
+        0,
       );
+      return (sumAPR / filteredHistory.length).toLocaleString();
     }
-    return constants.Zero;
-  }, [wstethWEB3, stETH]);
-
-  const submitPrice = useTxPrice(submitGas.data || constants.Zero);
-
-  const wrapPrice = useTxPrice(wrapGas.data || constants.Zero);
-  const unwrapPrice = useTxPrice(unwrapGas.data || constants.Zero);
-
-  const approve = async (
-    contract: WstethAbi | StethAbi,
-    amount: BigNumber,
-    recipient: string,
-  ) => {
-    const allowance = await contract.allowance(account ?? '', recipient);
-    if (allowance.gte(amount)) return;
-
-    setStatusData({
-      amount: enteredAmount,
-      step: 'approve-confirm',
-      chainId,
-      setStatus: (val) => setStatus(val),
-    });
-    const receipt = await contract.approve(recipient, amount);
-    setStatusData({
-      amount: enteredAmount,
-      step: 'approve-processing',
-      chainId,
-      setStatus: (val) => setStatus(val),
-    });
-    const response = await receipt.wait();
-    const { status, transactionHash } = response;
-    if (status) {
-      setStatusData({
-        amount: enteredAmount,
-        transactionHash,
-        step: 'approve-success',
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-    } else {
-      setStatusData({
-        transactionHash,
-        step: 'failed',
-        retry: true,
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-    }
-  };
-
-  const wrapTokens = async (amount: BigNumber) => {
-    if (stETH && wstethWEB3) {
-      let stETHAmount = amount;
-      if (activeToken === 'eth') {
-        setStatusData({
-          amount: utils.formatUnits(stETHAmount),
-          step: 'submit-confirm',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        stETHAmount = await stETH.callStatic.submit(constants.AddressZero, {
-          value: amount,
-        });
-        const submit = await stETH.submit(constants.AddressZero, {
-          value: amount,
-        });
-        setStatusData({
-          amount: utils.formatUnits(stETHAmount),
-          step: 'submit-processing',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        const response = await submit.wait();
-        const { status, transactionHash } = response;
-        if (status) {
-          setStatusData({
-            amount: utils.formatUnits(stETHAmount),
-            transactionHash,
-            step: 'submit-success',
-            chainId,
-            setStatus: (val) => setStatus(val),
-          });
-        } else {
-          setStatusData({
-            transactionHash,
-            step: 'failed',
-            retry: true,
-            chainId,
-            setStatus: (val) => setStatus(val),
-          });
-        }
-      }
-      console.log(+stETHAmount, +amount);
-      await approve(stETH, stETHAmount, getWstethAddress(chainId));
-
-      setStatusData({
-        amount: utils.formatUnits(stETHAmount),
-        step: 'wrap-confirm',
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-      const wrap = await wstethWEB3.wrap(stETHAmount);
-      setStatusData({
-        amount: utils.formatUnits(stETHAmount),
-        step: 'wrap-processing',
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-      const response = await wrap.wait();
-      const { status, transactionHash } = response;
-      if (status) {
-        setStatusData({
-          amount: utils.formatUnits(stETHAmount),
-          transactionHash,
-          step: 'wrap-success',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-      } else {
-        setStatusData({
-          transactionHash,
-          step: 'failed',
-          retry: true,
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-      }
-    } else {
-      notify('stETH undefined', 'error');
-    }
-  };
-
-  const unwrapTokens = async (amount: BigNumber) => {
-    if (wstethWEB3) {
-      setStatusData({
-        amount: enteredAmount,
-        step: 'unwrap-confirm',
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-      const unwrap = await wstethWEB3.unwrap(amount);
-      setStatusData({
-        amount: enteredAmount,
-        step: 'unwrap-processing',
-        chainId,
-        setStatus: (val) => setStatus(val),
-      });
-      const response = await unwrap.wait();
-      const { status, transactionHash } = response;
-      if (status) {
-        setStatusData({
-          amount: enteredAmount,
-          transactionHash,
-          step: 'unwrap-success',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-      } else {
-        setStatusData({
-          transactionHash,
-          step: 'failed',
-          retry: true,
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-      }
-    } else {
-      notify('wstethWEB3 undefined', 'error');
-    }
-  };
-
-  const handleClickTx = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (enteredAmount && enteredAmount !== '0' && stETH) {
-      setIsSubmitting(true);
-      try {
-        const parsedAmount = utils.parseUnits(enteredAmount);
-        if (selectedTab === 'WRAP') {
-          await wrapTokens(parsedAmount);
-        } else {
-          await unwrapTokens(parsedAmount);
-        }
-        setIsSubmitting(false);
-      } catch (ex) {
-        const error = ex as Error;
-        setStatusData({
-          step: 'failed',
-          reason: error.message.replace('MetaMask Tx Signature: ', ''),
-          retry: true,
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        setIsSubmitting(false);
-      }
-    } else {
-      notify('Please enter the amount', 'error');
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const amount = e.target.value;
-    if (isNaN(+amount) || /^00/.test(amount) || +amount < 0) {
-      return;
-    }
-    if (+amount === 0) {
-      setCanStake(false);
-    } else {
-      setCanStake(true);
-    }
-    setEnteredAmount(amount);
-  };
+    return '-';
+  }, [filteredHistory]);
 
   return (
     <>
       <Head>
         <title>Lido | Frontend Template</title>
       </Head>
-      <Tabs
-        options={['WRAP', 'UNWRAP']}
-        selected={selectedTab}
-        onSelectTab={setSelectedTab}
-      />
-      <Wallet />
+      <WalletCard>
+        <Input
+          fullwidth
+          value={address}
+          placeholder="Enter address"
+          disabled
+          error={
+            !utils.isAddress(address) && address ? 'Incorrect address.' : ''
+          }
+        />
+        <YellowLabel>
+          Current balance may differ from last balance in the table due to
+          rounding.
+        </YellowLabel>
+      </WalletCard>
       <Block>
-        <form action="" method="post" onSubmit={handleClickTx}>
-          <InputWrapper fullwidth ref={ref}>
-            {selectedTab === 'WRAP' && (
-              <SelectIcon
-                anchorRef={ref}
-                icon={iconsMap[activeToken]}
-                value={activeToken}
-                onChange={(value: keyof typeof iconsMap) =>
-                  setActiveToken(value)
-                }
-              >
-                <Option leftDecorator={iconsMap.steth} value="steth">
-                  Lido (stETH)
-                </Option>
-                <Option leftDecorator={iconsMap.eth} value="eth">
-                  Ethereum (ETH)
-                </Option>
-              </SelectIcon>
-            )}
-            <Input
-              fullwidth
-              value={enteredAmount}
-              placeholder="0"
-              leftDecorator={selectedTab === 'UNWRAP' ? <Wsteth /> : undefined}
-              disabled={isSubmitting}
-              onChange={handleChange}
-              label="Amount"
-            />
-          </InputWrapper>
-          <Button
-            fullwidth
-            type="submit"
-            disabled={!canStake || insufficientBalance}
-          >
-            {insufficientBalance
-              ? 'Insufficient Balance'
-              : selectedTab === 'UNWRAP'
-              ? 'Unwrap'
-              : 'Wrap'}
-          </Button>
-        </form>
-        <DataTable style={{ paddingTop: '24px' }}>
-          {selectedTab === 'WRAP' && (
-            <DataTableRow
-              title="Max unlock fee"
-              loading={approveTxPrice.initialLoading}
-            >
-              ${(approveTxPrice.data || 0).toFixed(2)}
-            </DataTableRow>
-          )}
-          <DataTableRow
-            title="Max gas fee"
-            loading={
-              wrapPrice.initialLoading ||
-              submitPrice.initialLoading ||
-              unwrapPrice.initialLoading ||
-              approveTxPrice.initialLoading
-            }
-          >
-            $
-            {(selectedTab === 'UNWRAP'
-              ? unwrapPrice.data || 0
-              : (approveTxPrice.data || 0) +
-                (wrapPrice.data || 0) +
-                (activeToken === 'eth' ? submitPrice.data || 0 : 0)
-            ).toFixed(2)}
-          </DataTableRow>
-          <DataTableRow
-            title="Exchange rate"
-            loading={
-              selectedTab === 'UNWRAP'
-                ? oneWstToSt.initialLoading
-                : oneStToWst.initialLoading
-            }
-          >
-            {`1 ${
-              selectedTab === 'WRAP' ? activeToken.toUpperCase() : 'WSTETH'
-            } = ${(+utils.formatUnits(
-              (selectedTab === 'UNWRAP' ? oneWstToSt.data : oneStToWst.data) ||
-                constants.Zero,
-            )).toFixed(4)} ${selectedTab === 'WRAP' ? 'wstETH' : 'stETH'}`}
-          </DataTableRow>
-          {selectedTab === 'WRAP' && (
-            <>
-              <DataTableRow
-                title="Allowance"
-                loading={stethAllowance.initialLoading}
-              >
-                {(+utils.formatUnits(
-                  stethAllowance.data || constants.Zero,
-                )).toFixed(4)}{' '}
-                stETH
-              </DataTableRow>
-              <DataTableRow
-                title="You will receive"
-                loading={oneStToWst.initialLoading}
-              >
-                {(+utils.formatUnits(
-                  utils
-                    .parseUnits(enteredAmount || '0')
-                    .mul(oneStToWst.data || constants.Zero),
-                  36,
-                )).toFixed(4)}{' '}
-                wstETH
-              </DataTableRow>
-            </>
-          )}
-        </DataTable>
+        <HStack>
+          <StackItem basis="25%">
+            <HStack>
+              <StackItem basis="100%">
+                <Text size="xs">stETH balance</Text>
+              </StackItem>
+              <StackItem basis="100%">
+                <HStack>
+                  <StackItem basis="10%">
+                    <Text size="lg" style={{ fontWeight: 700 }}>
+                      Ξ
+                    </Text>
+                  </StackItem>
+                  <StackItem>
+                    <Text size="lg" style={{ fontWeight: 500 }}>
+                      {weiToHumanReadable(
+                        (stETHBalance.data || 0).toString(),
+                        8,
+                      )}
+                    </Text>
+                  </StackItem>
+                </HStack>
+              </StackItem>
+              <StackItem basis="100%">
+                <Text size="xs" style={{ fontWeight: 300 }}>
+                  ${' '}
+                  {(
+                    parseFloat(
+                      weiToHumanReadable((stETHBalance.data || 0).toString()),
+                    ) * (ethPrice.data || 0)
+                  ).toLocaleString()}
+                </Text>
+              </StackItem>
+            </HStack>
+          </StackItem>
+          <StackItem basis="25%">
+            <HStack>
+              <StackItem basis="100%">
+                <Text size="xs">stETH rewarded</Text>
+              </StackItem>
+              <StackItem basis="100%">
+                <HStack>
+                  <StackItem basis="10%">
+                    <Text size="lg" style={{ fontWeight: 700 }} color="success">
+                      Ξ
+                    </Text>
+                  </StackItem>
+                  <StackItem>
+                    <Text size="lg" style={{ fontWeight: 500 }} color="success">
+                      {rewards}
+                    </Text>
+                  </StackItem>
+                </HStack>
+              </StackItem>
+              <StackItem basis="100%">
+                <Text size="xs" style={{ fontWeight: 300 }}>
+                  $ {rewardsInUsd.toLocaleString()}
+                </Text>
+              </StackItem>
+            </HStack>
+          </StackItem>
+          <StackItem basis="25%">
+            <HStack>
+              <StackItem basis="100%">
+                <Text size="xs">Average APR</Text>
+              </StackItem>
+              <StackItem basis="100%">
+                <Text size="lg">
+                  {avgAPR}
+                  {filteredHistory.length === 0 ? '' : '%'}
+                </Text>
+              </StackItem>
+              <StackItem basis="100%">
+                <Link
+                  style={{
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    fontSize: '14px',
+                    textDecoration: 'underline',
+                  }}
+                  href="https://lido.fi/faq"
+                >
+                  More info
+                </Link>
+              </StackItem>
+            </HStack>
+          </StackItem>
+          <StackItem basis="25%">
+            <HStack>
+              <StackItem basis="100%">
+                <Text size="xs">stETH price</Text>
+              </StackItem>
+              <StackItem basis="100%">
+                <HStack>
+                  <StackItem basis="10%">
+                    <Text size="lg" style={{ fontWeight: 700 }}>
+                      $
+                    </Text>
+                  </StackItem>
+                  <StackItem>
+                    <Text size="lg" style={{ fontWeight: 500 }}>
+                      {(ethPrice.data || 0).toLocaleString()}
+                    </Text>
+                  </StackItem>
+                </HStack>
+              </StackItem>
+              <StackItem basis="100%">
+                <HStack>
+                  <StackItem basis="7%">
+                    <Text size="xs" style={{ fontWeight: 300 }}>
+                      Ξ
+                    </Text>
+                  </StackItem>
+                  <StackItem>
+                    <Text size="xs" style={{ fontWeight: 300 }}>
+                      {weiToHumanReadable(
+                        (sharesByOneETH.data || 0).toString(),
+                        18,
+                      )}
+                    </Text>
+                  </StackItem>
+                </HStack>
+              </StackItem>
+            </HStack>
+          </StackItem>
+        </HStack>
       </Block>
-      <StatusModal
-        title={status.title}
-        subtitle={status.subtitle}
-        additionalDetails={status.additionalDetails}
-        link={status.link}
-        type={status.type}
-        show={status.show}
-        onClose={() => setStatus(INITIAL_STATUS)}
-        retry={status.retry}
-        onRetry={handleClickTx}
-      />
+      <Section>
+        <Block>
+          <HStack style={{ marginBottom: '24px' }}>
+            <StackItem basis={isMobile ? '100%' : undefined}>
+              <Text
+                size="xs"
+                color="secondary"
+                style={{ fontWeight: 700, marginRight: '24px' }}
+              >
+                Rewards history
+              </Text>
+            </StackItem>
+            <StackItem basis={isMobile ? '100%' : undefined}>
+              <Checkbox
+                style={{ marginTop: isMobile ? '12px' : '' }}
+                checked={onlyRewards}
+                onClick={() => setOnlyRewards((prev) => !prev)}
+                label="Only Show Rewards"
+              />
+            </StackItem>
+          </HStack>
+          <Table width="100%">
+            <Thead>
+              <Tr>
+                <Th>Date</Th>
+                <Th>Type</Th>
+                <Th>Ξ Change</Th>
+                {!isMobile && (
+                  <>
+                    <Th>$ Change</Th>
+                    <Th>APR</Th>
+                    <Th>Balance</Th>
+                  </>
+                )}
+              </Tr>
+            </Thead>
+            {filteredHistory.length !== 0 && (
+              <Tbody>
+                {filteredHistory.map((data) => (
+                  <Tr key={JSON.stringify(data)}>
+                    <Td>{data.date}</Td>
+                    <Td>{data.type}</Td>
+                    <Td>{data.change}</Td>
+                    {!isMobile && (
+                      <>
+                        <Td>
+                          {(
+                            parseFloat(data.change) * (ethPrice.data || 0)
+                          ).toFixed(8)}
+                        </Td>
+                        <Td>{data.apr}</Td>
+                        <Td>{data.balance}</Td>
+                      </>
+                    )}
+                  </Tr>
+                ))}
+              </Tbody>
+            )}
+          </Table>
+          {filteredHistory.length === 0 && (
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Text>no data</Text>
+            </div>
+          )}
+        </Block>
+      </Section>
     </>
   );
 };
