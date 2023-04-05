@@ -7,7 +7,7 @@ const infuraApiKey = process.env.INFURA_API_KEY;
 const apiProviderUrls = {
   [1]: process.env[`API_PROVIDER_URL_${1}`],
   [5]: process.env[`API_PROVIDER_URL_${5}`],
-  [11155111]: process.env[`API_PROVIDER_URL_${11155111}`],
+  [942]: process.env[`API_PROVIDER_URL_${942}`],
 };
 
 const cspTrustedHosts = process.env.CSP_TRUSTED_HOSTS;

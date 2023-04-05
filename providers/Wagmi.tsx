@@ -1,12 +1,13 @@
 import { WagmiConfig, createClient, configureChains } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { ReactNode } from 'react';
-import { mainnet, goerli, sepolia } from 'wagmi/chains';
+import { mainnet, goerli } from 'wagmi/chains';
 import { createConnectors } from '@reef-knot/core-react';
 import { rpc } from '../utils/rpc';
+import { pulsechain } from '../config/chains';
 
 const { provider, webSocketProvider } = configureChains(
-  [mainnet, goerli, sepolia],
+  [mainnet, goerli, pulsechain],
   [publicProvider()],
 );
 const connectors = createConnectors({

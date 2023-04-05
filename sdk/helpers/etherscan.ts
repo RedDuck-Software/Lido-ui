@@ -14,7 +14,7 @@ export const ETHERSCAN_PREFIX_BY_NETWORK: {
 } = {
   [CHAINS.Mainnet]: '',
   [CHAINS.Goerli]: 'goerli.',
-  [CHAINS.Sepolia]: 'sepolia.',
+  [CHAINS.Pulsechain]: '',
 };
 
 export const getEtherscanPrefix = (chainId: CHAINS): string => {
@@ -32,7 +32,8 @@ export const getEtherscanLink = (
   const prefix = getEtherscanPrefix(chainId);
   invariant(hash && typeof hash === 'string', 'Hash should be a string');
   invariant(entity && typeof entity === 'string', 'Entity should be a string');
-
+  if (chainId === CHAINS.Pulsechain)
+    return `https://scan.v3.testnet.pulsechain.com/${entity}/${hash}`;
   return `https://${prefix}etherscan.io/${entity}/${hash}`;
 };
 
