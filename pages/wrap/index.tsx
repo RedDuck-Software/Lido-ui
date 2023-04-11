@@ -114,7 +114,7 @@ const Wrap = () => {
     if (stETH) {
       return await stETH.estimateGas.approve(
         getWstethAddress(chainId),
-        constants.WeiPerEther,
+        utils.parseUnits('0.000000001'),
       );
     }
     return constants.Zero;
@@ -125,7 +125,7 @@ const Wrap = () => {
   const submitGas = useAsyncFetch<BigNumber>(async () => {
     if (stETH) {
       return await stETH.estimateGas.submit(constants.AddressZero, {
-        value: constants.WeiPerEther,
+        value: utils.parseUnits('0.000000001'),
       });
     }
     return constants.Zero;

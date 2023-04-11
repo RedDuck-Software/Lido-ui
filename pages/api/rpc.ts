@@ -26,6 +26,7 @@ const rpc: Rpc = async (req, res) => {
     infura: infuraApiKey,
     alchemy: alchemyApiKey,
   });
+  serverLogger.debug('URLS: ', urls);
 
   const customProvider = apiProviderUrls?.[chainId];
 
@@ -35,6 +36,7 @@ const rpc: Rpc = async (req, res) => {
 
   const requested = await fetchWithFallbacks(urls, {
     method: 'POST',
+    headers: { ['Content-Type']: 'application/json' },
     // Next by default parses our body for us, we don't want that here
     body: JSON.stringify(req.body),
   });

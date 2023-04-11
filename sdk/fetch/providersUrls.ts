@@ -9,8 +9,8 @@ export const getInfuraRPCUrl = (chainId: CHAINS, apiKey: string): string => {
       return `https://mainnet.infura.io/v3/${apiKey}`;
     case CHAINS.Goerli:
       return `https://goerli.infura.io/v3/${apiKey}`;
-    case CHAINS.Sepolia:
-      return `https://sepolia.infura.io/v3/${apiKey}`;
+    case CHAINS.Pulsechain:
+      return `https://rpc.v3.testnet.pulsechain.com`;
     default:
       invariant(false, 'Chain is not supported');
   }
@@ -24,8 +24,8 @@ export const getAlchemyRPCUrl = (chainId: CHAINS, apiKey: string): string => {
       return `https://eth-mainnet.alchemyapi.io/v2/${apiKey}`;
     case CHAINS.Goerli:
       return `https://eth-goerli.alchemyapi.io/v2/${apiKey}`;
-    case CHAINS.Sepolia:
-      return `https://eth-sepolia.alchemyapi.io/v2/${apiKey}`;
+    case CHAINS.Pulsechain:
+      return `https://rpc.v3.testnet.pulsechain.com`;
     default:
       invariant(false, 'Chain is not supported');
   }
