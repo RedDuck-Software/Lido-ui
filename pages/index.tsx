@@ -85,7 +85,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
     if (stETH) {
       const estimationWrap = await stETH.estimateGas.submit(
         constants.AddressZero,
-        { value: constants.WeiPerEther },
+        { value: utils.parseUnits('0.000000001') },
       );
       console.log('estimation', +estimationWrap);
       return estimationWrap;
