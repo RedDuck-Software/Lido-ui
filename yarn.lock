@@ -1899,6 +1899,14 @@
     ua-parser-js "^1.0.2"
     use-callback-ref "1.2.5"
 
+"@lidofinance/loaders@^1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@lidofinance/loaders/-/loaders-1.6.0.tgz#151a9c0f16a2dac9ffea2877556d4738f907d8f4"
+  integrity sha512-ceN3GNE96ptOt+3BMyddqiYJS3cF5RibDR7KeCtzd9DHaj2fnbdhICpvlsCl7uynd49UaKFCYAAMYgjz65rx1g==
+  dependencies:
+    "@lidofinance/theme" "2.7.0"
+    "@lidofinance/utils" "1.3.2"
+
 "@lidofinance/next-api-wrapper@^0.16.0":
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/@lidofinance/next-api-wrapper/-/next-api-wrapper-0.16.0.tgz#8fa17eb5344f30256e8a4410c244ef3e35d24728"
@@ -1908,6 +1916,16 @@
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/@lidofinance/next-cache-files-middleware/-/next-cache-files-middleware-0.16.0.tgz#3a3b2873f8c35958751ff9b1296fcec415822bd1"
   integrity sha512-9UeJMb0WVfNfPNRoO0i9VrF2wvfULqKW7iJprQ20ghJQY4slWD+xMuMmFYUuKnYDKFwr2VS2G73dX6iPFy9d8A==
+
+"@lidofinance/theme@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@lidofinance/theme/-/theme-2.7.0.tgz#b8af6238d305b63ba9c90b384475672f01c760a5"
+  integrity sha512-7imZkUjVQZnrQSiGysDpLu3M8YOu9yBInyoHDopMPpm7LTKcwMZvohy3LOASW/8hKaOjNcfataV28xlGy2w7bQ==
+
+"@lidofinance/utils@1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@lidofinance/utils/-/utils-1.3.2.tgz#63ba5be298bc415c20edcd9d930319e496199068"
+  integrity sha512-sP1ZhAoWz9OpU1S5jzDzl0bnwKXZDBT1RLFFKDBW/+YkoxYAlFReyuA/w5R+I0iYjlBkdzkZZReNM/XzIO4YXg==
 
 "@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0":
   version "1.1.0"

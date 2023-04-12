@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useSDK, CHAINS, getChainColor } from 'sdk';
 import { useWeb3 } from '@reef-knot/web3-react';
-import { ThemeToggler } from '@lidofinance/lido-ui';
+import { ThemeToggler } from 'ui/cookie-theme-toggler';
 
 import WalletButton from 'components/walletButton';
 import WalletConnect from 'components/walletConnect';
