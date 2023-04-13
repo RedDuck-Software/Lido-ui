@@ -6,7 +6,7 @@ import Document, {
   DocumentContext,
   DocumentInitialProps,
 } from 'next/document';
-import { Fonts, LidoUIHead } from '@lidofinance/lido-ui';
+import { Fonts, LidoUIHead } from 'ui/theme';
 import { ServerStyleSheet } from 'styled-components';
 import { dynamics } from '../config';
 
@@ -97,12 +97,6 @@ export default class MyDocument extends Document {
           <meta property="og:title" content={this.metaTitle} />
           <meta property="og:description" content={this.metaDescription} />
           <meta property="og:image" content={this.metaPreviewImgUrl} />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={this.metaTitle} />
-          <meta name="twitter:description" content={this.metaDescription} />
-          <meta name="twitter:image:src" content={this.metaPreviewImgUrl} />
-          <meta name="twitter:site" content="@lidofinance" />
-          <meta name="twitter:creator" content="@lidofinance" />
           <meta name="description" content={this.metaDescription} />
           <meta name="currentChain" content={String(dynamics.defaultChain)} />
           <Fonts />

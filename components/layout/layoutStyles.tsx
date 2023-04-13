@@ -25,3 +25,28 @@ export const LayoutSubTitleStyle = styled.h4`
     display: none;
   }
 `;
+
+export const LayoutWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-rows: 1fr;
+  ${({ theme }) => theme.mediaQueries.sm} {
+    max-width: 100vw;
+    overflow-x: hidden;
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const LayoutInsertWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
+  ${({ theme }) => theme.mediaQueries.sm} {
+    height: unset;
+  }
+`;

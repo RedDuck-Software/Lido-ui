@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//@ts-nocheck
 import styled from 'styled-components';
 
 interface TabProps {
@@ -7,7 +9,6 @@ interface TabProps {
 export const TabWrapper = styled.div`
   width: 186px;
   height: 44px;
-  /* background-color: rgb(226, 230, 235); */
   background-color: ${({ theme }) => theme.colors.backgroundDarken};
   border-radius: 22px;
   position: relative;
@@ -22,8 +23,7 @@ export const TabWrapper = styled.div`
 export const TabSlider = styled.div<{ selectedOption: number }>`
   width: 93px;
   height: 40px;
-  background-color: white;
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.backgroundSecondary};
   border-radius: 20px;
   position: absolute;
   transition: left 0.3s ease 0s;
@@ -36,7 +36,7 @@ export const TabSlider = styled.div<{ selectedOption: number }>`
 
 export const TabLabel = styled.p<TabProps>`
   z-index: 2;
-  margin: 0px;
+  margin: 0;
   width: 25%;
   text-align: center;
   opacity: ${(props) => (!props.isSelected ? `0.5` : `1`)};
@@ -47,4 +47,5 @@ export const TabLabel = styled.p<TabProps>`
   letter-spacing: 0.3px;
   font-weight: 800;
   cursor: pointer;
+  color: ${({ theme }) => theme.colors.text};
 `;

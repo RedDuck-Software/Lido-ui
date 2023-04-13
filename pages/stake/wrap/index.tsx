@@ -11,13 +11,13 @@ import {
   useWSTETHContractRPC,
   useWSTETHContractWeb3,
   WstethAbi,
-} from '../../sdk';
-import { useStethContractWeb3 } from '../../hooks';
+} from '../../../sdk';
+import { useStethContractWeb3 } from '../../../hooks';
 import { MatomoEventType, trackEvent } from '@lidofinance/analytics-matomo';
 import { constants, utils } from 'ethers';
-import notify from '../../utils/notify';
+import notify from '../../../utils/notify';
 import Head from 'next/head';
-import Wallet from '../../components/wallet';
+import Wallet from '../../../components/wallet';
 import {
   Block,
   Button,
@@ -31,13 +31,13 @@ import {
   Steth,
   Wsteth,
 } from '@lidofinance/lido-ui';
-import StatusModal from '../../components/statusModal';
-import Tabs from '../../components/tabs/Tabs';
+import StatusModal from '../../../components/statusModal';
+import Tabs from '../../../components/tabs/Tabs';
 import styled from 'styled-components';
-import { INITIAL_STATUS, IStatus, setStatusData } from '../../config/steps';
+import { INITIAL_STATUS, IStatus, setStatusData } from '../../../config/steps';
 import { BigNumber } from '@ethersproject/bignumber';
-import { getStethAddress, getWstethAddress } from '../../config/addresses';
-import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
+import { getStethAddress, getWstethAddress } from '../../../config/addresses';
+import { useAsyncFetch } from '../../../sdk/react/hooks/useAsyncFetch';
 
 const iconsMap = {
   eth: <Eth />,
@@ -373,7 +373,7 @@ const Wrap = () => {
       />
       <Wallet />
       <Block>
-        <form action="" method="post" onSubmit={handleClickTx}>
+        <form action="stake/wrap" method="post" onSubmit={handleClickTx}>
           <InputWrapper fullwidth ref={ref}>
             {selectedTab === 'WRAP' && (
               <SelectIcon

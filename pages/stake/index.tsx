@@ -26,13 +26,13 @@ import Wallet from 'components/wallet';
 import Section from 'components/section';
 import Faq from 'components/faq';
 import { FAQItem, getFaqList } from 'utils/faqList';
-import { useStethContractWeb3 } from '../hooks';
+import { useStethContractWeb3 } from '../../hooks';
 import { constants, utils } from 'ethers';
-import notify from '../utils/notify';
+import notify from '../../utils/notify';
 import StatusModal from 'components/statusModal';
-import { getStethAddress } from '../config/addresses';
-import { INITIAL_STATUS, setStatusData } from '../config/steps';
-import { useAsyncFetch } from '../sdk/react/hooks/useAsyncFetch';
+import { getStethAddress } from '../../config/addresses';
+import { INITIAL_STATUS, setStatusData } from '../../config/steps';
+import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
 import { BigNumber } from '@ethersproject/bignumber';
 
 interface HomeProps {
@@ -174,7 +174,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
       </Head>
       <Wallet onlyStETH />
       <Block>
-        <form action="" method="post" onSubmit={handleSubmitTokens}>
+        <form action="pages" method="post" onSubmit={handleSubmitTokens}>
           <InputWrapper>
             <Input
               fullwidth

@@ -1,4 +1,6 @@
-import styled, { css } from '@reef-knot/ui-react/styled-wrapper';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+import styled, { css } from 'styled-components';
 import { Button } from '@reef-knot/ui-react';
 
 export const ConnectButtonStyle = styled(Button).attrs({
@@ -12,7 +14,7 @@ export const ConnectButtonStyle = styled(Button).attrs({
     font-size: ${fontSizesMap.xxs}px;
     padding: 5px;
     margin-bottom: 10px;
-    background: ${colors.background};
+    background: ${colors.backgroundSecondary};
   `}
 `;
 

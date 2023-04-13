@@ -20,7 +20,7 @@ export const themeLight: ITheme = {
     secondaryContrast: '#fff',
 
     background: '#f2f4f6',
-    backgroundDarken: '#dae0e5',
+    backgroundDarken: '#ffffff',
     backgroundSecondary: '#EFF2F6',
 
     foreground: '#fff',
@@ -66,8 +66,8 @@ export const themeDark: ITheme = {
     secondaryHover: '#fff',
     secondaryContrast: '#273852',
 
-    background: '#1c1c21',
-    backgroundDarken: '#131317',
+    background: 'linear-gradient(112.08deg, #3d6585 -19.77%, #000000 56.84%)',
+    backgroundDarken: '#06070A',
     backgroundSecondary: '#27272E',
 
     foreground: '#34343d',

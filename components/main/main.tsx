@@ -6,7 +6,9 @@ const Main: FC<PropsWithChildren> = (props) => {
   const routes = useRouter();
   return (
     <MainStyle
-      style={{ maxWidth: routes.pathname === '/rewards' ? '960px' : undefined }}
+      style={{
+        maxWidth: routes.pathname === '/stake/rewards' ? '960px' : undefined,
+      }}
       size="tight"
       forwardedAs="main"
       {...props}
