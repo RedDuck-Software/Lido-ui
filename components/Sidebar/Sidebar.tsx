@@ -51,7 +51,7 @@ export const getActivePage = (path: string): IPageName => {
   }
 };
 
-const Sidebar: FC<ISidebarProps> = ({ opened }) => {
+const Sidebar: FC<ISidebarProps> = ({ opened, setOpenedSidebar }) => {
   const { isMobile } = useMatchBreakpoints();
   const { pathname } = useRouter();
   const active = getActivePage(pathname);
@@ -59,28 +59,44 @@ const Sidebar: FC<ISidebarProps> = ({ opened }) => {
   return (
     <StyledSidebar opened={opened}>
       <SidebarInsetContainer>
-        <SidebarLink active={active === 'Dashboard'} href={'/'}>
+        <SidebarLink
+          active={active === 'Dashboard'}
+          href={'/'}
+          onClick={() => setOpenedSidebar(false)}
+        >
           <DashboardIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Dashboard
         </SidebarLink>
-        <SidebarLink active={active === 'Claim'} href="/claim">
+        <SidebarLink
+          active={active === 'Claim'}
+          href="/claim"
+          onClick={() => setOpenedSidebar(false)}
+        >
           <ClaimIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Claim
         </SidebarLink>
-        <SidebarLink active={active === 'Calculator'} href="/calculator">
+        <SidebarLink
+          active={active === 'Calculator'}
+          href="/calculator"
+          onClick={() => setOpenedSidebar(false)}
+        >
           <CalculatorIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Calculator
         </SidebarLink>
-        <SidebarLink active={active === 'Stake'} href="/stake">
+        <SidebarLink
+          active={active === 'Stake'}
+          href="/stake"
+          onClick={() => setOpenedSidebar(false)}
+        >
           <SwapIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
@@ -89,33 +105,46 @@ const Sidebar: FC<ISidebarProps> = ({ opened }) => {
         </SidebarLink>
         {(active === 'Stake' || active === 'Wrap' || active === 'History') && (
           <SideBarSubMenu>
-            <SideBarSubMenuItem active={active === 'Wrap'} href="/stake/wrap">
+            <SideBarSubMenuItem
+              active={active === 'Wrap'}
+              href="/stake/wrap"
+              onClick={() => setOpenedSidebar(false)}
+            >
               <span>Wrap</span>
             </SideBarSubMenuItem>
             <SideBarSubMenuItem
               active={active === 'History'}
               href="/stake/rewards"
+              onClick={() => setOpenedSidebar(false)}
             >
               <span>History</span>
             </SideBarSubMenuItem>
           </SideBarSubMenu>
         )}
 
-        <SidebarLink active={active === 'Stablecoin'} href="/stablecoin">
+        <SidebarLink
+          active={active === 'Stablecoin'}
+          href="/stablecoin"
+          onClick={() => setOpenedSidebar(false)}
+        >
           <StakeSideIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Stablecoin
         </SidebarLink>
-        <SidebarLink active={active === 'Swap'} href="/swap">
+        <SidebarLink
+          active={active === 'Swap'}
+          href="/swap"
+          onClick={() => setOpenedSidebar(false)}
+        >
           <SwapIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Swap
         </SidebarLink>
-        <SidebarLink href="/">
+        <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
           <DocIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
@@ -125,14 +154,14 @@ const Sidebar: FC<ISidebarProps> = ({ opened }) => {
       </SidebarInsetContainer>
 
       <SidebarInsetContainer>
-        <SidebarLink href="/">
+        <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
           <DocIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Settings
         </SidebarLink>
-        <SidebarLink href="/">
+        <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
           <DocIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}

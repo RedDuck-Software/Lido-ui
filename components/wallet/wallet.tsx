@@ -47,9 +47,9 @@ const Wallet: WalletComponent = (props) => {
     <WalletCard {...props}>
       <WalletCardRow>
         <WalletCardBalance
-          title="Eth balance"
+          title="PLS balance"
           loading={eth.initialLoading}
-          value={<FormatToken amount={eth.data} symbol="ETH" />}
+          value={<FormatToken amount={eth.data} symbol="PLS" />}
         />
         <WalletCardAccount account={account} />
       </WalletCardRow>
@@ -62,7 +62,7 @@ const Wallet: WalletComponent = (props) => {
           value={
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <FormatToken amount={steth.data} symbol="stETH" />
+                <FormatToken amount={steth.data} symbol="stPLS" />
                 <TokenToWallet address={stethAddress} />
               </div>
               {!props.onlyStETH && (
@@ -71,7 +71,7 @@ const Wallet: WalletComponent = (props) => {
                   <FormatToken
                     style={{ fontWeight: 400, fontSize: '12px' }}
                     amount={stETHToWstETH.data}
-                    symbol="wstETH"
+                    symbol="wstPLS"
                   />
                 </div>
               )}
@@ -86,7 +86,7 @@ const Wallet: WalletComponent = (props) => {
             value={
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FormatToken amount={wsteth.data} symbol="wstETH" />
+                  <FormatToken amount={wsteth.data} symbol="wstPLS" />
                   <TokenToWallet address={wstethAddress} />
                 </div>
                 {!props.onlyStETH && (
@@ -95,7 +95,7 @@ const Wallet: WalletComponent = (props) => {
                     <FormatToken
                       style={{ fontWeight: 400, fontSize: '12px' }}
                       amount={wstETHToStETH.data}
-                      symbol="stETH"
+                      symbol="stPLS"
                     />
                   </div>
                 )}

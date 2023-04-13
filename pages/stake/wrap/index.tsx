@@ -40,8 +40,8 @@ import { getStethAddress, getWstethAddress } from '../../../config/addresses';
 import { useAsyncFetch } from '../../../sdk/react/hooks/useAsyncFetch';
 
 const iconsMap = {
-  eth: <Eth />,
-  steth: <Steth />,
+  pls: <Eth />,
+  stpls: <Steth />,
 };
 
 const InputWrapper = styled(InputGroup)`
@@ -60,7 +60,7 @@ const Wrap = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [canStake, setCanStake] = useState(false);
   const [activeToken, setActiveToken] =
-    useState<keyof typeof iconsMap>('steth');
+    useState<keyof typeof iconsMap>('stpls');
 
   const oneStToWst = useContractSWR({
     contract: wstethRPC,
@@ -95,7 +95,7 @@ const Wrap = () => {
   const currentBalance = useMemo<string>(() => {
     return selectedTab === 'UNWRAP'
       ? utils.formatUnits(wstethBalance.data || constants.Zero)
-      : activeToken === 'eth'
+      : activeToken === 'pls'
       ? utils.formatUnits(ethBalance.data || constants.Zero)
       : utils.formatUnits(stethBalance.data || constants.Zero);
   }, [
@@ -202,7 +202,7 @@ const Wrap = () => {
   const wrapTokens = async (amount: BigNumber) => {
     if (stETH && wstethWEB3) {
       let stETHAmount = amount;
-      if (activeToken === 'eth') {
+      if (activeToken === 'pls') {
         setStatusData({
           amount: utils.formatUnits(stETHAmount),
           step: 'submit-confirm',
@@ -384,11 +384,11 @@ const Wrap = () => {
                   setActiveToken(value)
                 }
               >
-                <Option leftDecorator={iconsMap.steth} value="steth">
-                  Lido (stETH)
+                <Option leftDecorator={iconsMap.stpls} value="stpls">
+                  Poolsea (stPLS)
                 </Option>
-                <Option leftDecorator={iconsMap.eth} value="eth">
-                  Ethereum (ETH)
+                <Option leftDecorator={iconsMap.pls} value="pls">
+                  Pulse (PLS)
                 </Option>
               </SelectIcon>
             )}
@@ -437,7 +437,7 @@ const Wrap = () => {
               ? unwrapPrice.data || 0
               : (approveTxPrice.data || 0) +
                 (wrapPrice.data || 0) +
-                (activeToken === 'eth' ? submitPrice.data || 0 : 0)
+                (activeToken === 'pls' ? submitPrice.data || 0 : 0)
             ).toFixed(2)}
           </DataTableRow>
           <DataTableRow
@@ -449,11 +449,11 @@ const Wrap = () => {
             }
           >
             {`1 ${
-              selectedTab === 'WRAP' ? activeToken.toUpperCase() : 'WSTETH'
+              selectedTab === 'WRAP' ? activeToken.toUpperCase() : 'WSTPLS'
             } = ${(+utils.formatUnits(
               (selectedTab === 'UNWRAP' ? oneWstToSt.data : oneStToWst.data) ||
                 constants.Zero,
-            )).toFixed(4)} ${selectedTab === 'WRAP' ? 'wstETH' : 'stETH'}`}
+            )).toFixed(4)} ${selectedTab === 'WRAP' ? 'wstPLS' : 'stPLS'}`}
           </DataTableRow>
           {selectedTab === 'WRAP' && (
             <>
@@ -464,7 +464,7 @@ const Wrap = () => {
                 {(+utils.formatUnits(
                   stethAllowance.data || constants.Zero,
                 )).toFixed(4)}{' '}
-                stETH
+                stPLS
               </DataTableRow>
               <DataTableRow
                 title="You will receive"
@@ -476,7 +476,7 @@ const Wrap = () => {
                     .mul(oneStToWst.data || constants.Zero),
                   36,
                 )).toFixed(4)}{' '}
-                wstETH
+                wstPLS
               </DataTableRow>
             </>
           )}

@@ -24,8 +24,6 @@ import { trackEvent, MatomoEventType } from '@lidofinance/analytics-matomo';
 
 import Wallet from 'components/wallet';
 import Section from 'components/section';
-import Faq from 'components/faq';
-import { FAQItem, getFaqList } from 'utils/faqList';
 import { useStethContractWeb3 } from '../../hooks';
 import { constants, utils } from 'ethers';
 import notify from '../../utils/notify';
@@ -35,15 +33,11 @@ import { INITIAL_STATUS, setStatusData } from '../../config/steps';
 import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
 import { BigNumber } from '@ethersproject/bignumber';
 
-interface HomeProps {
-  faqList: FAQItem[];
-}
-
 const InputWrapper = styled.div`
   margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
 `;
 
-const Home: FC<HomeProps> = ({ faqList }) => {
+const Home: FC = () => {
   const { chainId } = useSDK();
   const stETH = useStethContractWeb3();
   const [enteredAmount, setEnteredAmount] = useState('');
@@ -199,13 +193,13 @@ const Home: FC<HomeProps> = ({ faqList }) => {
             title="You will receive"
             loading={tokenName.initialLoading}
           >
-            {enteredAmount || 0} stETH
+            {enteredAmount || 0} stPLS
           </DataTableRow>
           <DataTableRow
             title="Exchange rate"
             loading={tokenName.initialLoading}
           >
-            1 ETH = 1 stETH
+            1 PLS = 1 stPLS
           </DataTableRow>
           <DataTableRow
             title="Max transaction cost"
@@ -239,7 +233,7 @@ const Home: FC<HomeProps> = ({ faqList }) => {
               {(+utils.formatUnits(
                 totalStaked.data ?? constants.Zero,
               )).toLocaleString()}{' '}
-              ETH
+              PLS
             </DataTableRow>
             <DataTableRow
               title="stETH market cap"
@@ -254,7 +248,6 @@ const Home: FC<HomeProps> = ({ faqList }) => {
           </DataTable>
         </Block>
       </Section>
-      <Faq faqList={faqList} />
       <StatusModal
         title={status.title}
         subtitle={status.subtitle}
@@ -272,8 +265,6 @@ const Home: FC<HomeProps> = ({ faqList }) => {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () => ({
-  props: {
-    faqList: await getFaqList(['lido-frontend-template']),
-  },
+export const getStaticProps: GetStaticProps = async () => ({
+  props: {},
 });

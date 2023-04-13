@@ -18,7 +18,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = (props) => {
 
   return (
     <LayoutWrapper>
-      <Sidebar opened={isOpened} />
+      <Sidebar opened={isOpened} setOpenedSidebar={setIsOpened} />
       <LayoutInsertWrapper>
         <Head>
           <meta name="description" content="Lido Template" />
