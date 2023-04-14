@@ -31,7 +31,7 @@ const WalletButton: FC<ButtonProps> = (props) => {
           {initialLoading ? (
             <WalledButtonLoaderStyle />
           ) : (
-            <FormatToken amount={balance} symbol="ETH" />
+            <FormatToken amount={balance} symbol="PLS" />
           )}
         </WalledButtonBalanceStyle>
         <AddressBadge address={account} />

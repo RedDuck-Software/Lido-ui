@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import Head from 'next/head';
-import { ServicePage } from '@lidofinance/lido-ui';
+import { ServicePage } from 'ui/service-page';
 
 const Page404: FC = () => (
   <ServicePage title="500">

@@ -25,11 +25,17 @@ export const Terms: FC<WalletModalConnectTermsProps> = (props) => {
       <Checkbox onChange={handleCheckboxChange} checked={props.checked} />
       <TermsTextStyle>
         I have read and accept{' '}
-        <Link href="https://lido.fi/terms-of-use">
+        <Link href="https://lido.fi/terms-of-use" style={{ color: '#17A8FA' }}>
           Terms&nbsp;of&nbsp;Service
         </Link>{' '}
         and{' '}
-        <Link href="https://lido.fi/privacy-notice">Privacy&nbsp;Notice</Link>.
+        <Link
+          href="https://lido.fi/privacy-notice"
+          style={{ color: '#17A8FA' }}
+        >
+          Privacy&nbsp;Notice
+        </Link>
+        .
       </TermsTextStyle>
     </TermsStyle>
   );

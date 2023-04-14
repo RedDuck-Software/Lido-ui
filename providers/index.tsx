@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from 'react';
-import { CookieThemeProvider } from '@lidofinance/lido-ui';
+import { CookieThemeProvider } from 'ui/theme';
 
 import { GlobalStyle } from 'styles';
 

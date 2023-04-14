@@ -65,8 +65,8 @@ export const setStatusData = ({
       break;
     case 'wrap-confirm':
       setStatus({
-        title: `You are now wrapping stETH/ETH`,
-        subtitle: `Wrapping ${amount}. You will receive wstETH. `,
+        title: `You are now wrapping stPLS/PLS`,
+        subtitle: `Wrapping ${amount}. You will receive wstPLS. `,
         additionalDetails: 'Confirm this transaction in your wallet',
         type: 'loading',
         link: '',
@@ -76,8 +76,8 @@ export const setStatusData = ({
       break;
     case 'wrap-processing':
       setStatus({
-        title: `You are now wrapping stETH/ETH`,
-        subtitle: `Wrapping ${amount}. You will receive wstETH. `,
+        title: `You are now wrapping stPLS/PLS`,
+        subtitle: `Wrapping ${amount}. You will receive wstPLS. `,
         additionalDetails: 'Processing your transaction',
         type: 'loading',
         link: '',
@@ -88,7 +88,7 @@ export const setStatusData = ({
     case 'wrap-success':
       setStatus({
         title: `Wrap successful`,
-        subtitle: `You wrapped ${amount} stETH/ETH.`,
+        subtitle: `You wrapped ${amount} stPLS/PLS.`,
         additionalDetails: '',
         type: 'success',
         link: transactionHash
@@ -100,8 +100,8 @@ export const setStatusData = ({
       break;
     case 'unwrap-confirm':
       setStatus({
-        title: `You are now unwrapping wstETH`,
-        subtitle: `Unwrapping ${amount}. You will receive stETH. `,
+        title: `You are now unwrapping wstPLS`,
+        subtitle: `Unwrapping ${amount}. You will receive stPLS. `,
         additionalDetails: 'Confirm this transaction in your wallet',
         type: 'loading',
         link: '',
@@ -111,8 +111,8 @@ export const setStatusData = ({
       break;
     case 'unwrap-processing':
       setStatus({
-        title: `You are now unwrapping wstETH`,
-        subtitle: `Unwrapping ${amount}. You will receive stETH. `,
+        title: `You are now unwrapping wstPLS`,
+        subtitle: `Unwrapping ${amount}. You will receive stPLS. `,
         additionalDetails: 'Processing your transaction',
         type: 'loading',
         link: '',
@@ -123,7 +123,7 @@ export const setStatusData = ({
     case 'unwrap-success':
       setStatus({
         title: `Unwrap successful`,
-        subtitle: `You unwrapped ${amount} wstETH.`,
+        subtitle: `You unwrapped ${amount} wstPLS.`,
         additionalDetails: '',
         type: 'success',
         link: transactionHash
@@ -135,8 +135,8 @@ export const setStatusData = ({
       break;
     case 'submit-confirm':
       setStatus({
-        title: `You are now submitting ETH`,
-        subtitle: `Submitting ${amount}. You will receive stETH. `,
+        title: `You are now submitting PLS`,
+        subtitle: `Submitting ${amount}. You will receive stPLS. `,
         additionalDetails: 'Confirm this transaction in your wallet',
         type: 'loading',
         link: '',
@@ -146,8 +146,8 @@ export const setStatusData = ({
       break;
     case 'submit-processing':
       setStatus({
-        title: `You are now submitting ETH`,
-        subtitle: `Submitting ${amount}. You will receive stETH. `,
+        title: `You are now submitting PLS`,
+        subtitle: `Submitting ${amount}. You will receive stPLS. `,
         additionalDetails: 'Processing your transaction',
         type: 'loading',
         link: '',
@@ -158,7 +158,7 @@ export const setStatusData = ({
     case 'submit-success':
       setStatus({
         title: `Submit successful`,
-        subtitle: `You have submitted ${amount} ETH.`,
+        subtitle: `You have submitted ${amount} PLS.`,
         additionalDetails: '',
         type: 'success',
         link: transactionHash

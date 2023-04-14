@@ -1,8 +1,6 @@
 import {
   Address,
   ButtonIcon,
-  Modal,
-  ModalProps,
   Identicon,
   External,
   Copy,
@@ -20,6 +18,7 @@ import {
   WalletModalAddressStyle,
   WalletModalActionsStyle,
 } from './walletModalStyles';
+import { Modal, ModalProps } from '../../ui/modal';
 
 const WalletModal: FC<ModalProps> = (props) => {
   const { onClose } = props;
@@ -65,6 +64,7 @@ const WalletModal: FC<ModalProps> = (props) => {
 
         <WalletModalActionsStyle>
           <ButtonIcon
+            color={'secondary'}
             onClick={handleCopy}
             icon={<Copy />}
             size="xs"
@@ -73,6 +73,7 @@ const WalletModal: FC<ModalProps> = (props) => {
             Copy address
           </ButtonIcon>
           <ButtonIcon
+            color={'secondary'}
             onClick={handleEtherscan}
             icon={<External />}
             size="xs"

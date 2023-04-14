@@ -20,22 +20,37 @@ migrationAllowCookieToCrossDomainCookieClientSide(
   'LIDO_WIDGET__COOKIES_ALLOWED',
 );
 
+const getTitle = (path: string): string => {
+  switch (path) {
+    case '/stake':
+      return 'Stake PLS';
+    case '/stake/wrap':
+      return 'Wrap & Unwrap';
+    case '/stake/rewards':
+      return 'Reward History';
+    default:
+      return '';
+  }
+};
+const getDescription = (path: string): string => {
+  switch (path) {
+    case '/stake':
+      return 'Stake PLS and receive stPLS while staking.';
+    case '/stake/wrap':
+      return 'Stable-balance stPLS wrapper for DeFi';
+    case '/stake/rewards':
+      return 'Track your staking rewards.';
+    default:
+      return '';
+  }
+};
+
 const App = (props: AppProps): JSX.Element => {
   const { Component, pageProps } = props;
   const routes = useRouter();
 
-  const title =
-    routes.pathname === '/'
-      ? 'Stake Ether'
-      : routes.pathname === '/wrap'
-      ? 'Wrap & Unwrap'
-      : 'Reward History';
-  const description =
-    routes.pathname === '/'
-      ? 'Stake ETH and receive stETH while staking.'
-      : routes.pathname === '/wrap'
-      ? 'Stable-balance stETH wrapper for DeFi'
-      : 'Track your Ethereum staking rewards with Lido.';
+  const title = getTitle(routes.pathname);
+  const description = getDescription(routes.pathname);
 
   return (
     <Layout title={title} subtitle={description}>

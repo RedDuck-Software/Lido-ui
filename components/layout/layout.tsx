@@ -1,28 +1,36 @@
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useState } from 'react';
 import Head from 'next/head';
 import Header from 'components/header';
 import Main from 'components/main';
-import Footer from 'components/footer';
-import { LayoutTitleStyle, LayoutSubTitleStyle } from './layoutStyles';
+import {
+  LayoutTitleStyle,
+  LayoutSubTitleStyle,
+  LayoutWrapper,
+  LayoutInsertWrapper,
+} from './layoutStyles';
 import { LayoutProps } from './types';
+import Sidebar from '../Sidebar/Sidebar';
 
 const Layout: FC<PropsWithChildren<LayoutProps>> = (props) => {
   const { title, subtitle } = props;
   const { children } = props;
+  const [isOpened, setIsOpened] = useState<boolean>(false);
 
   return (
-    <>
-      <Head>
-        <meta name="description" content="Lido Template" />
-      </Head>
-      <Header />
-      <Main>
-        <LayoutTitleStyle>{title}</LayoutTitleStyle>
-        <LayoutSubTitleStyle>{subtitle}</LayoutSubTitleStyle>
-        {children}
-      </Main>
-      <Footer />
-    </>
+    <LayoutWrapper>
+      <Sidebar opened={isOpened} setOpenedSidebar={setIsOpened} />
+      <LayoutInsertWrapper>
+        <Head>
+          <meta name="description" content="Lido Template" />
+        </Head>
+        <Header setOpenedSidebar={setIsOpened} />
+        <Main>
+          <LayoutTitleStyle>{title}</LayoutTitleStyle>
+          <LayoutSubTitleStyle>{subtitle}</LayoutSubTitleStyle>
+          {children}
+        </Main>
+      </LayoutInsertWrapper>
+    </LayoutWrapper>
   );
 };
 

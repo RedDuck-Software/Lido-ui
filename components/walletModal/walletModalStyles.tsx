@@ -24,6 +24,7 @@ export const WalletModalConnectorStyle = styled.div`
 
 export const WalletModalDisconnectStyle = styled(Button)`
   flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.textSecondary};
 `;
 
 export const WalletModalAccountStyle = styled.div`

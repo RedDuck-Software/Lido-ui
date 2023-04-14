@@ -1,279 +1,267 @@
-import { FC, FormEvent, useEffect, useMemo, useState } from 'react';
-import { GetStaticProps } from 'next';
-import styled from 'styled-components';
-import Head from 'next/head';
+import React, { FC } from 'react';
 import {
-  useContractSWR,
-  useSTETHContractRPC,
-  useSDK,
-  getEtherscanTokenLink,
-  useEthPrice,
-  useTxPrice,
-  useEthereumBalance,
-} from 'sdk';
-import {
-  Block,
-  Link,
-  DataTable,
-  DataTableRow,
-  Input,
-  Steth,
-  Button,
-} from '@lidofinance/lido-ui';
-import { trackEvent, MatomoEventType } from '@lidofinance/analytics-matomo';
+  DashboardContainer,
+  DashboardStatsContainer,
+  DashboardLabel,
+  DashboardTablesContainer,
+  DashboardWrapper,
+  DashboardRebaseContainer,
+  DashboardRebaseStatContainer,
+  DashboardGraphContainer,
+  DashboardTableContainer,
+} from '../components/dashboard/styles';
+import Image from 'next/image';
+import AvgHoldIcon from '../images/dashboard/market/averageHolding.png';
+import ApyIcon from '../images/dashboard/market/apy.png';
+import BackendIcon from '../images/dashboard/market/backed.png';
+import CircIcon from '../images/dashboard/market/circulating.png';
+import CapIcon from '../images/dashboard/market/marketCap.png';
+import RebaseIcon from '../images/dashboard/market/nextRebase.png';
+import LockIcon from '../images/dashboard/icons/padlock.png';
+import HexIcon from '../images/dashboard/icons/hex.png';
+import PlsIcon from '../images/dashboard/icons/pulsechain.png';
+import PlsxIcon from '../images/dashboard/icons/plsx.png';
+import GraphIcon from '../images/dashboard/usdChart.png';
+import GraphSupIcon from '../images/dashboard/supply.png';
+import useMatchBreakpoints from '../hooks/useMatchBreakpoints';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@lidofinance/lido-ui';
 
-import Wallet from 'components/wallet';
-import Section from 'components/section';
-import Faq from 'components/faq';
-import { FAQItem, getFaqList } from 'utils/faqList';
-import { useStethContractWeb3 } from '../hooks';
-import { constants, utils } from 'ethers';
-import notify from '../utils/notify';
-import StatusModal from 'components/statusModal';
-import { getStethAddress } from '../config/addresses';
-import { INITIAL_STATUS, setStatusData } from '../config/steps';
-import { useAsyncFetch } from '../sdk/react/hooks/useAsyncFetch';
-import { BigNumber } from '@ethersproject/bignumber';
-
-interface HomeProps {
-  faqList: FAQItem[];
-}
-
-const InputWrapper = styled.div`
-  margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
-`;
-
-const Home: FC<HomeProps> = ({ faqList }) => {
-  const { chainId } = useSDK();
-  const stETH = useStethContractWeb3();
-  const [enteredAmount, setEnteredAmount] = useState('');
-  const [status, setStatus] = useState(INITIAL_STATUS);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [canStake, setCanStake] = useState(false);
-  const ethBalance = useEthereumBalance();
-
-  const insufficientBalance = useMemo(() => {
-    return (
-      parseFloat(utils.formatUnits(ethBalance.data || constants.Zero)) <
-      parseFloat(enteredAmount)
-    );
-  }, [ethBalance.data, enteredAmount]);
-
-  useEffect(() => {
-    const matomoSomeEvent: MatomoEventType = [
-      'Lido_Frontend_Template',
-      'Mount index component',
-      'mount_index_component',
-    ];
-
-    trackEvent(...matomoSomeEvent);
-  }, []);
-
-  const contractRpc = useSTETHContractRPC();
-  const tokenName = useContractSWR({
-    contract: contractRpc,
-    method: 'name',
-  });
-  const totalStaked = useContractSWR({
-    contract: contractRpc,
-    method: 'getTotalPooledEther',
-  });
-
-  const ethPrice = useEthPrice();
-
-  const submitGas = useAsyncFetch<BigNumber>(async () => {
-    if (stETH) {
-      const estimationWrap = await stETH.estimateGas.submit(
-        constants.AddressZero,
-        { value: utils.parseUnits('0.000000001') },
-      );
-      console.log('estimation', +estimationWrap);
-      return estimationWrap;
-    }
-    return constants.Zero;
-  }, [stETH]);
-
-  const txPrice = useTxPrice(submitGas.data || constants.Zero);
-
-  const handleSubmitTokens = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (enteredAmount && enteredAmount !== '0' && stETH) {
-      setIsSubmitting(true);
-      try {
-        const parsedAmount = utils.parseUnits(enteredAmount);
-        setStatusData({
-          amount: enteredAmount,
-          step: 'submit-confirm',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        const submit = await stETH.submit(constants.AddressZero, {
-          value: parsedAmount,
-        });
-        setStatusData({
-          amount: enteredAmount,
-          step: 'submit-processing',
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        const response = await submit.wait();
-        const { status, transactionHash } = response;
-        if (status) {
-          setStatusData({
-            amount: enteredAmount,
-            transactionHash,
-            step: 'submit-success',
-            chainId,
-            setStatus: (val) => setStatus(val),
-          });
-          setEnteredAmount('');
-          setCanStake(false);
-        } else {
-          setStatusData({
-            transactionHash,
-            step: 'failed',
-            retry: true,
-            chainId,
-            setStatus: (val) => setStatus(val),
-          });
-        }
-        setIsSubmitting(false);
-      } catch (ex) {
-        const error = ex as Error;
-        setStatusData({
-          step: 'failed',
-          reason: error.message.replace('MetaMask Tx Signature: ', ''),
-          retry: true,
-          chainId,
-          setStatus: (val) => setStatus(val),
-        });
-        setIsSubmitting(false);
-      }
-    } else {
-      notify('Please enter the amount', 'error');
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const amount = e.target.value;
-    if (isNaN(+amount) || /^00/.test(amount) || +amount < 0) {
-      return;
-    }
-    if (+amount === 0) {
-      setCanStake(false);
-    } else {
-      setCanStake(true);
-    }
-    setEnteredAmount(amount);
-  };
-
+const Dashboard: FC = () => {
+  const { isMobile } = useMatchBreakpoints();
   return (
-    <>
-      <Head>
-        <title>Lido | Frontend Template</title>
-      </Head>
-      <Wallet onlyStETH />
-      <Block>
-        <form action="" method="post" onSubmit={handleSubmitTokens}>
-          <InputWrapper>
-            <Input
-              fullwidth
-              value={enteredAmount}
-              placeholder="0"
-              leftDecorator={<Steth />}
-              disabled={isSubmitting}
-              onChange={handleChange}
-              label="Amount"
+    <DashboardWrapper>
+      <DashboardTablesContainer>
+        <DashboardContainer>
+          <DashboardStatsContainer>
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={CapIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>Market Cap</p>
+              </div>
+              <p>$249,574,281.98</p>
+            </DashboardLabel>
+
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={ApyIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>APY Statistics</p>
+              </div>
+              <p>$0.1960</p>
+            </DashboardLabel>
+
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={RebaseIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>Next Rebase</p>
+              </div>
+              <p>00:17:59</p>
+            </DashboardLabel>
+
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={CircIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>Circulating Supply</p>
+              </div>
+              <p>1,273,260,219</p>
+            </DashboardLabel>
+
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={BackendIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>Backend Liquidity</p>
+              </div>
+              <p>159.14%</p>
+            </DashboardLabel>
+
+            <DashboardLabel>
+              <div>
+                <div>
+                  <Image
+                    src={AvgHoldIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p>Average Holding</p>
+              </div>
+              <p>$4,065.88</p>
+            </DashboardLabel>
+          </DashboardStatsContainer>
+        </DashboardContainer>
+
+        <DashboardContainer>
+          <DashboardRebaseContainer>
+            <DashboardLabel lg>
+              <div>
+                <div>
+                  <Image
+                    src={LockIcon}
+                    alt={'icon'}
+                    layout="fill"
+                    objectFit="contain"
+                  />
+                </div>
+                <p style={{ fontWeight: 700 }}>Next Rebase</p>
+              </div>
+              <p style={{ color: '#17a8fa', fontWeight: 700, opacity: 1 }}>
+                $5,245,205.87 USD
+              </p>
+            </DashboardLabel>
+            <DashboardRebaseStatContainer>
+              <DashboardLabel>
+                <p>$249.12</p>
+                <div>
+                  <div>
+                    <Image
+                      src={HexIcon}
+                      alt={'icon'}
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                  <p style={{ fontWeight: 700 }}>HEX</p>
+                </div>
+              </DashboardLabel>
+              <DashboardLabel>
+                <p>$249.12</p>
+                <div>
+                  <div>
+                    <Image
+                      src={PlsIcon}
+                      alt={'icon'}
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                  <p style={{ fontWeight: 700 }}>PLS</p>
+                </div>
+              </DashboardLabel>
+              <DashboardLabel>
+                <p>$249.12</p>
+                <div>
+                  <div>
+                    <Image
+                      src={PlsxIcon}
+                      alt={'icon'}
+                      layout="fill"
+                      objectFit="contain"
+                    />
+                  </div>
+                  <p style={{ fontWeight: 700 }}>PLSX</p>
+                </div>
+              </DashboardLabel>
+            </DashboardRebaseStatContainer>
+          </DashboardRebaseContainer>
+        </DashboardContainer>
+
+        <DashboardContainer>
+          <DashboardGraphContainer>
+            <Image
+              src={GraphIcon}
+              alt={'icon'}
+              layout="fill"
+              objectFit="contain"
             />
-          </InputWrapper>
-          <Button
-            fullwidth
-            type="submit"
-            disabled={!canStake || insufficientBalance}
+          </DashboardGraphContainer>
+        </DashboardContainer>
+
+        <DashboardContainer>
+          <DashboardGraphContainer
+            style={{ height: isMobile ? '320px' : undefined }}
           >
-            {insufficientBalance ? 'Insufficient Balance' : 'Submit'}
-          </Button>
-        </form>
-        <DataTable style={{ paddingTop: '24px' }}>
-          <DataTableRow
-            title="You will receive"
-            loading={tokenName.initialLoading}
-          >
-            {enteredAmount || 0} stETH
-          </DataTableRow>
-          <DataTableRow
-            title="Exchange rate"
-            loading={tokenName.initialLoading}
-          >
-            1 ETH = 1 stETH
-          </DataTableRow>
-          <DataTableRow
-            title="Max transaction cost"
-            loading={txPrice.initialLoading}
-          >
-            ${(txPrice.data ?? 0).toFixed(2)}
-          </DataTableRow>
-          <DataTableRow
-            title="Reward fee"
-            loading={tokenName.initialLoading}
-            help="Please note: this fee applies to staking rewards only, and is NOT taken from your staked amount."
-          >
-            15%
-          </DataTableRow>
-        </DataTable>
-      </Block>
-      <Section
-        title="Statistics"
-        headerDecorator={
-          <Link href={getEtherscanTokenLink(chainId, getStethAddress(chainId))}>
-            View on Etherscan
-          </Link>
-        }
-      >
-        <Block>
-          <DataTable>
-            <DataTableRow
-              title="Total staked"
-              loading={totalStaked.initialLoading}
-            >
-              {(+utils.formatUnits(
-                totalStaked.data ?? constants.Zero,
-              )).toLocaleString()}{' '}
-              ETH
-            </DataTableRow>
-            <DataTableRow
-              title="stETH market cap"
-              loading={tokenName.initialLoading || ethPrice.loading}
-            >
-              $
-              {(
-                +utils.formatUnits(totalStaked.data ?? constants.Zero) *
-                (ethPrice.data ?? 0)
-              ).toLocaleString()}
-            </DataTableRow>
-          </DataTable>
-        </Block>
-      </Section>
-      <Faq faqList={faqList} />
-      <StatusModal
-        title={status.title}
-        subtitle={status.subtitle}
-        additionalDetails={status.additionalDetails}
-        link={status.link}
-        type={status.type}
-        show={status.show}
-        onClose={() => setStatus(INITIAL_STATUS)}
-        retry={status.retry}
-        onRetry={handleSubmitTokens}
-      />
-    </>
+            <Image
+              src={GraphSupIcon}
+              alt={'icon'}
+              layout="fill"
+              objectFit="contain"
+            />
+          </DashboardGraphContainer>
+        </DashboardContainer>
+      </DashboardTablesContainer>
+      <DashboardContainer>
+        <DashboardTableContainer>
+          <Table width="100%">
+            <Thead>
+              <Tr>
+                <Th>Ticker</Th>
+                <Th>Address Name</Th>
+                <Th>Balance</Th>
+                <Th>Price</Th>
+                <Th>Value (USD)</Th>
+                <Th>Address</Th>
+                <Th />
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td>PulseChain</Td>
+                <Td>0x5555</Td>
+                <Td>207.962</Td>
+                <Td>$837.02</Td>
+                <Td>$2,365.01</Td>
+                <Td>0x1618</Td>
+                <Td>0x1618</Td>
+              </Tr>
+              <Tr>
+                <Td>Pulsex</Td>
+                <Td>0x5555</Td>
+                <Td>207.962</Td>
+                <Td>$837.02</Td>
+                <Td>$2,365.01</Td>
+                <Td>0x1618</Td>
+                <Td>0x1618</Td>
+              </Tr>
+              <Tr>
+                <Td>Hex</Td>
+                <Td>0x5555</Td>
+                <Td>207.962</Td>
+                <Td>$837.02</Td>
+                <Td>$2,365.01</Td>
+                <Td>0x1618</Td>
+                <Td>0x1618</Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </DashboardTableContainer>
+      </DashboardContainer>
+    </DashboardWrapper>
   );
 };
 
-export default Home;
-
-export const getStaticProps: GetStaticProps<HomeProps> = async () => ({
-  props: {
-    faqList: await getFaqList(['lido-frontend-template']),
-  },
-});
+export default Dashboard;

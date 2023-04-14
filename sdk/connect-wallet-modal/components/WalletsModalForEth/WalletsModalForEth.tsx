@@ -22,10 +22,7 @@ import {
   ConnectZenGo,
   ConnectZerion,
 } from '../../connectButtons';
-import {
-  ButtonsCommonProps,
-  WalletsModal,
-} from '@reef-knot/connect-wallet-modal';
+import { ButtonsCommonProps, WalletsModal } from 'sdk/connect-wallet-modal';
 import { WalletsModalForEthProps } from './types';
 import { WALLET_IDS, WalletId } from '../../constants';
 import { ConnectInjectedProps } from '../../connectButtons/types';
@@ -133,6 +130,8 @@ export const WalletsModalForEth = (
   props: WalletsModalForEthProps,
 ): JSX.Element => (
   <WalletsModal {...props}>
+    {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+    {/*@ts-ignore*/}
     {(commonProps: ButtonsCommonProps) =>
       getWalletsButtons(commonProps, props.hiddenWallets)
     }

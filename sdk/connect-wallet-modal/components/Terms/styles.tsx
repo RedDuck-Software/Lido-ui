@@ -1,4 +1,4 @@
-import styled, { css } from '@reef-knot/ui-react/styled-wrapper';
+import styled, { css } from 'styled-components';
 
 export const TermsStyle = styled.label`
   ${({ theme: { fontSizesMap, spaceMap, borderRadiusesMap, colors } }) => css`
@@ -10,7 +10,7 @@ export const TermsStyle = styled.label`
     margin-top: ${spaceMap.sm}px;
     margin-bottom: ${spaceMap.md}px;
     border-radius: ${borderRadiusesMap.lg}px;
-    background: ${colors.background};
+    background: ${colors.foreground};
     cursor: pointer;
   `}
 `;
