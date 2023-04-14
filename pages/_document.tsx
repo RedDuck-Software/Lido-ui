@@ -48,13 +48,13 @@ export default class MyDocument extends Document {
   }
 
   get metaTitle(): string {
-    return 'Lido Frontend Template | Lido';
+    return 'Poolsea';
   }
 
   get metaDescription(): string {
     return (
-      'Liquid staking with Lido. ' +
-      'Stake {TOKEN} with Lido to earn daily rewards while keeping full control of your staked tokens. ' +
+      'Poolsea. ' +
+      'Stake PLS with Poolsea to earn daily rewards while keeping full control of your staked tokens. ' +
       'Start earning rewards in just a few clicks.'
     );
   }
@@ -68,8 +68,8 @@ export default class MyDocument extends Document {
       <Html lang="en">
         <Head>
           <link rel="manifest" href="/manifest.json" />
-          <link rel="icon" href="/favicon.ico" sizes="any" />
-          <link rel="icon" type="image/svg+xml" href="favicon-512x512.svg" />
+          <link rel="icon" href="/logo.svg" sizes="any" />
+          <link rel="icon" type="image/svg+xml" href="/logo.svg" />
           <link
             rel="apple-touch-icon"
             sizes="180x180"
@@ -77,21 +77,21 @@ export default class MyDocument extends Document {
           />
           <link
             rel="icon"
-            type="image/png"
             sizes="194x194"
-            href="/favicon-194x194.png"
+            type="image/svg+xml"
+            href="/logo.svg"
           />
           <link
             rel="icon"
-            type="image/png"
             sizes="32x32"
-            href="/favicon-32x32.png"
+            type="image/svg+xml"
+            href="/logo.svg"
           />
           <link
             rel="icon"
-            type="image/png"
             sizes="16x16"
-            href="/favicon-16x16.png"
+            type="image/svg+xml"
+            href="/logo.svg"
           />
           <meta property="og:type" content="website" />
           <meta property="og:title" content={this.metaTitle} />
