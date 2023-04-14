@@ -19,6 +19,7 @@ import {
 import useMatchBreakpoints from '../../hooks/useMatchBreakpoints';
 import { ISidebarProps } from './types';
 import { useRouter } from 'next/router';
+import { useDisconnect } from '../../sdk';
 
 export type IPageName =
   | 'Dashboard'
@@ -57,6 +58,7 @@ const Sidebar: FC<ISidebarProps> = ({ opened, setOpenedSidebar }) => {
   const { isMobile } = useMatchBreakpoints();
   const { pathname } = useRouter();
   const active = getActivePage(pathname);
+  const { disconnect } = useDisconnect();
 
   return (
     <StyledSidebar opened={opened}>
@@ -163,7 +165,13 @@ const Sidebar: FC<ISidebarProps> = ({ opened, setOpenedSidebar }) => {
           />
           Settings
         </SidebarLink>
-        <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
+        <SidebarLink
+          href=""
+          onClick={() => {
+            if (disconnect) disconnect();
+            setOpenedSidebar(false);
+          }}
+        >
           <LogoutIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
