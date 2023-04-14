@@ -19,7 +19,7 @@ export const DashboardTablesContainer = styled.div`
 `;
 export const DashboardContainer = styled.div`
   width: 100%;
-  background-color: #131823;
+  background-color: ${({ theme }) => theme.colors.foreground};
   border-radius: 14px;
 `;
 export const DashboardStatsContainer = styled.div`

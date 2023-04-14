@@ -10,7 +10,7 @@ export const TermsStyle = styled.label`
     margin-top: ${spaceMap.sm}px;
     margin-bottom: ${spaceMap.md}px;
     border-radius: ${borderRadiusesMap.lg}px;
-    background: ${colors.background};
+    background: ${colors.foreground};
     cursor: pointer;
   `}
 `;

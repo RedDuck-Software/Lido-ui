@@ -66,11 +66,17 @@ export const themeDark: ITheme = {
     secondaryHover: '#fff',
     secondaryContrast: '#273852',
 
+    primary: '#192B45',
+    primaryContrast: '#17A8FA',
+    primaryHover: '#192B50',
+
+    accent: '#06070A',
+
     background: 'linear-gradient(112.08deg, #3d6585 -19.77%, #000000 56.84%)',
     backgroundDarken: '#06070A',
-    backgroundSecondary: '#131823',
+    backgroundSecondary: '#27272E',
 
-    foreground: '#34343d',
+    foreground: '#131823',
 
     overlay: 'rgba(0, 0, 0, 0.5)',
 
@@ -81,14 +87,14 @@ export const themeDark: ITheme = {
     textSecondary: 'rgba(255, 255, 255, .8)',
     accentText: '#fff',
 
-    border: 'rgba(255, 255, 255, 0.12)',
+    border: '#2D3853',
     borderActive: 'rgba(255, 255, 255, 0.48)',
     borderHover: 'rgba(255, 255, 255, 0.24)',
     borderLight: '#484855',
     accentBorder: 'rgba(255, 255, 255, 0.12)',
     accentBorderHover: 'rgba(255, 255, 255, 0.24)',
 
-    controlBg: '#2f2f37',
+    controlBg: '#131823',
     accentControlBg: 'rgba(39, 39, 46, 0.56)',
 
     popupMenuItemBgActiveHover: '#fff',
