@@ -68,7 +68,7 @@ export const themeDark: ITheme = {
 
     background: 'linear-gradient(112.08deg, #3d6585 -19.77%, #000000 56.84%)',
     backgroundDarken: '#06070A',
-    backgroundSecondary: '#27272E',
+    backgroundSecondary: '#131823',
 
     foreground: '#34343d',
 
