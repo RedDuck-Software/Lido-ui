@@ -17,7 +17,6 @@ import {
   DataTable,
   DataTableRow,
   Input,
-  Steth,
   Button,
 } from '@lidofinance/lido-ui';
 import { trackEvent, MatomoEventType } from '@lidofinance/analytics-matomo';
@@ -32,6 +31,7 @@ import { getStethAddress } from '../../config/addresses';
 import { INITIAL_STATUS, setStatusData } from '../../config/steps';
 import { useAsyncFetch } from '../../sdk/react/hooks/useAsyncFetch';
 import { BigNumber } from '@ethersproject/bignumber';
+import { Steth } from '../../ui/icons';
 
 const InputWrapper = styled.div`
   margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
@@ -174,7 +174,7 @@ const Home: FC = () => {
               fullwidth
               value={enteredAmount}
               placeholder="0"
-              leftDecorator={<Steth />}
+              leftDecorator={<Steth width="24px" height="24px" />}
               disabled={isSubmitting}
               onChange={handleChange}
               label="Amount"

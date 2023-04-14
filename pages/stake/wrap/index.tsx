@@ -27,8 +27,6 @@ import {
   InputGroup,
   SelectIcon,
   Option,
-  Eth,
-  Steth,
   Wsteth,
 } from '@lidofinance/lido-ui';
 import StatusModal from '../../../components/statusModal';
@@ -38,10 +36,11 @@ import { INITIAL_STATUS, IStatus, setStatusData } from '../../../config/steps';
 import { BigNumber } from '@ethersproject/bignumber';
 import { getStethAddress, getWstethAddress } from '../../../config/addresses';
 import { useAsyncFetch } from '../../../sdk/react/hooks/useAsyncFetch';
+import { Pulse, Steth } from '../../../ui/icons';
 
 const iconsMap = {
-  pls: <Eth />,
-  stpls: <Steth />,
+  pls: <Pulse width="24px" height="24px" />,
+  stpls: <Steth width="24px" height="24px" />,
 };
 
 const InputWrapper = styled(InputGroup)`

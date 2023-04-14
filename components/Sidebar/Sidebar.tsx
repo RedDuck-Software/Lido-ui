@@ -11,6 +11,8 @@ import {
   ClaimIcon,
   DashboardIcon,
   DocIcon,
+  LogoutIcon,
+  SettingsIcon,
   StakeSideIcon,
   SwapIcon,
 } from '../../ui/icons';
@@ -155,14 +157,14 @@ const Sidebar: FC<ISidebarProps> = ({ opened, setOpenedSidebar }) => {
 
       <SidebarInsetContainer>
         <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
-          <DocIcon
+          <SettingsIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
           Settings
         </SidebarLink>
         <SidebarLink href="/" onClick={() => setOpenedSidebar(false)}>
-          <DocIcon
+          <LogoutIcon
             width={`${isMobile ? 20 : 24}px`}
             height={`${isMobile ? 20 : 24}px`}
           />
