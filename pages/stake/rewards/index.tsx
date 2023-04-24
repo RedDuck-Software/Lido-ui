@@ -122,7 +122,7 @@ const Wrap = () => {
   return (
     <>
       <Head>
-        <title>Lido | Frontend Template</title>
+        <title>Poolsea | Rewards</title>
       </Head>
       <WalletCard>
         <Input
