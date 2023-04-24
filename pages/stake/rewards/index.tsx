@@ -61,7 +61,7 @@ const Wrap = () => {
 
   useEffect(() => {
     const matomoSomeEvent: MatomoEventType = [
-      'Lido_Frontend_Template',
+      'Rewards',
       'Mount index component',
       'mount_index_component',
     ];
