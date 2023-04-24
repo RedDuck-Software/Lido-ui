@@ -363,7 +363,7 @@ const Wrap = () => {
   return (
     <>
       <Head>
-        <title>Lido | Frontend Template</title>
+        <title>Poolsea | Wrap</title>
       </Head>
       <Tabs
         options={['WRAP', 'UNWRAP']}
