@@ -55,7 +55,7 @@ const Home: FC = () => {
 
   useEffect(() => {
     const matomoSomeEvent: MatomoEventType = [
-      'Lido_Frontend_Template',
+      'Stake your PLS',
       'Mount index component',
       'mount_index_component',
     ];
