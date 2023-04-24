@@ -164,7 +164,7 @@ const Home: FC = () => {
   return (
     <>
       <Head>
-        <title>Lido | Frontend Template</title>
+        <title>Poolsea | Stake</title>
       </Head>
       <Wallet onlyStETH />
       <Block>
